@@ -8,19 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `Pote.Converters.Advanced.nearest_pantone/1` y `nearest_pantone_name/1` para aproximación de colores Pantone.
-- Property-based tests con `stream_data` para verificar roundtrip de conversiones RGB↔Hex, RGB↔HSL, RGB↔HSV.
-- Alias `Pote.Converters.RGB` importado en `Pote.Format` para reducir anidamiento.
+- `Pote.Converters.Advanced.nearest_pantone/1` and `nearest_pantone_name/1` for Pantone color approximation.
+- Property-based tests using `stream_data` to verify roundtrip of RGB↔Hex, RGB↔HSL, RGB↔HSV conversions.
+- `Pote.Converters.RGB` alias imported in `Pote.Format` to reduce nesting.
 
 ### Changed
-- **Refactor**: `Pote.Conversions` (legacy) ahora delega vía `@deprecated` a `Pote.Converters.*`. Las funciones siguen funcionando pero emiten warning de deprecation.
-- `Pote.Converters.Advanced.delta_e/2` es ahora el source-of-truth; `Pote.Conversions.delta_e/2` delega con `@deprecated`.
-- `rgb_to_pantone_approx/1` (legacy) ahora delega a `Pote.Converters.Advanced.nearest_pantone/1` con `@deprecated`.
+- **i18n**: translated remaining Spanish docstrings and inline comments to English across the library for consistency.
+- **Refactor**: `Pote.Conversions` (legacy) now delegates via `@deprecated` to `Pote.Converters.*`. The functions still work but emit a deprecation warning.
+- `Pote.Converters.Advanced.delta_e/2` is now the source of truth; `Pote.Conversions.delta_e/2` delegates with `@deprecated`.
+- `rgb_to_pantone_approx/1` (legacy) now delegates to `Pote.Converters.Advanced.nearest_pantone/1` with `@deprecated`.
 
 ### Deprecated
-- `Pote.Conversions.*` está deprecated en favor de `Pote.Converters.*`. Estará en runtime-error en `2.0.0`.
+- `Pote.Conversions.*` is deprecated in favour of `Pote.Converters.*`. It will raise a runtime error in `2.0.0`.
 
 ## [1.0.0] - 2026-06-10
 
 ### Added
-- Initial release: parsing, conversion, harmonization, gradient generation, ANSI rendering across RGB, Hex, HSL, HSV, CMYK, ARGB, XTerm256, Atom.
+- Initial open source release: parsing, conversion, harmonization, gradient generation, ANSI rendering across RGB, Hex, HSL, HSV, CMYK, ARGB, XTerm256, Atom.
+
+[1.0.0]: https://hex.pm/packages/pote/1.0.0
