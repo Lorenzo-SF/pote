@@ -1,15 +1,15 @@
 defmodule Pote.Converters.Advanced do
   @moduledoc """
-  Conversiones avanzadas de color para espacios de color especiales.
+  Advanced color conversions for special color spaces.
 
-  Incluye:
+  Includes:
   - CIE XYZ
   - CIELAB
   - YUV (BT.601)
   - YCbCr (BT.601)
-  - Temperatura de color (Kelvin)
-  - Delta E (distancia de color)
-  - Contraste WCAG
+  - Color temperature (Kelvin)
+  - Delta E (color distance)
+  - WCAG contrast
   """
 
   alias Pote.Converters
@@ -25,7 +25,7 @@ defmodule Pote.Converters.Advanced do
   # ============================================================================
 
   @doc """
-  Convierte RGB a CIE XYZ usando la matriz sRGB D65.
+  Converts RGB to CIE XYZ using the sRGB D65 matrix.
   """
   @spec to_xyz(rgb()) :: xyz()
   def to_xyz({r, g, b}) do
@@ -48,7 +48,7 @@ defmodule Pote.Converters.Advanced do
   end
 
   @doc """
-  Convierte CIE XYZ a RGB (sRGB D65).
+  Converts CIE XYZ to RGB (sRGB D65).
   """
   @spec from_xyz(xyz()) :: rgb()
   def from_xyz({x, y, z}) do
@@ -76,7 +76,7 @@ defmodule Pote.Converters.Advanced do
   # ============================================================================
 
   @doc """
-  Convierte RGB a CIELAB (D65 illuminant).
+  Converts RGB to CIELAB (D65 illuminant).
   """
   @spec to_lab(rgb()) :: lab()
   def to_lab(rgb) do
@@ -108,7 +108,7 @@ defmodule Pote.Converters.Advanced do
   end
 
   @doc """
-  Convierte CIELAB a RGB (sRGB D65).
+  Converts CIELAB to RGB (sRGB D65).
   """
   @spec from_lab(lab()) :: rgb()
   def from_lab({l, a, b}) do
@@ -147,10 +147,10 @@ defmodule Pote.Converters.Advanced do
   # ============================================================================
 
   @doc """
-  Calcula la distancia Delta E 1976 entre dos colores.
+  Calculates the Delta E 1976 distance between two colors.
 
-  Esta es la distancia Euclidiana en espacio CIELAB.
-  Valores < 1.0 son imperceptibles.
+  This is the Euclidean distance in CIELAB space.
+  Values < 1.0 are imperceptible.
   """
   @spec delta_e(rgb(), rgb()) :: float()
   def delta_e(rgb1, rgb2) do
@@ -166,7 +166,7 @@ defmodule Pote.Converters.Advanced do
   # ============================================================================
 
   @doc """
-  Calcula la luminancia relativa WCAG 2.1 de un color.
+  Calculates the WCAG 2.1 relative luminance of a color.
   """
   @spec relative_luminance(rgb()) :: float()
   def relative_luminance({r, g, b}) do
@@ -186,7 +186,7 @@ defmodule Pote.Converters.Advanced do
   end
 
   @doc """
-  Calcula el ratio de contraste WCAG 2.1 entre dos colores.
+  Calculates the WCAG 2.1 contrast ratio between two colors.
 
   WCAG AA requiere 4.5:1 para texto normal, 7:1 para AAA.
   """
@@ -207,7 +207,7 @@ defmodule Pote.Converters.Advanced do
   # ============================================================================
 
   @doc """
-  Convierte RGB a YUV (BT.601, PAL/NTSC broadcast).
+  Converts RGB to YUV (BT.601, PAL/NTSC broadcast).
   """
   @spec to_yuv(rgb()) :: yuv()
   def to_yuv({r, g, b}) do
@@ -219,7 +219,7 @@ defmodule Pote.Converters.Advanced do
   end
 
   @doc """
-  Convierte YUV (BT.601) a RGB.
+  Converts YUV (BT.601) to RGB.
   """
   @spec from_yuv(yuv()) :: rgb()
   def from_yuv({y, u, v}) do
@@ -238,7 +238,7 @@ defmodule Pote.Converters.Advanced do
   # ============================================================================
 
   @doc """
-  Convierte RGB a YCbCr (BT.601, digital video).
+  Converts RGB to YCbCr (BT.601, digital video).
   """
   @spec to_ycbcr(rgb()) :: ycbcr()
   def to_ycbcr({r, g, b}) do
@@ -250,7 +250,7 @@ defmodule Pote.Converters.Advanced do
   end
 
   @doc """
-  Convierte YCbCr (BT.601) a RGB.
+  Converts YCbCr (BT.601) to RGB.
   """
   @spec from_ycbcr(ycbcr()) :: rgb()
   def from_ycbcr({y, cb, cr}) do
@@ -269,14 +269,14 @@ defmodule Pote.Converters.Advanced do
   end
 
   # ============================================================================
-  # Temperatura de color (Kelvin)
+  # Color temperature (Kelvin)
   # ============================================================================
 
   @doc """
-  Approxima la temperatura de color correlacionada (CCT) en Kelvin desde un color RGB.
+  Approximates the correlated color temperature (CCT) in Kelvin from an RGB color.
 
-  Usa una búsqueda iterativa sobre `kelvin_to_rgb/1` para encontrar
-  la temperatura más cercana.
+  Uses an iterative search over `kelvin_to_rgb/1` to find the
+  closest matching temperature.
   """
   @spec rgb_to_kelvin(rgb()) :: pos_integer() | nil
   def rgb_to_kelvin(rgb) do
@@ -309,9 +309,9 @@ defmodule Pote.Converters.Advanced do
   end
 
   @doc """
-  Convierte temperatura en Kelvin a RGB.
+  Converts temperature in Kelvin to RGB.
 
-  Basado en el algoritmo de Tanner Helland para aproximación de radiación black-body.
+  Based on Tanner Helland's algorithm for black-body radiation approximation.
   """
   @spec kelvin_to_rgb(pos_integer()) :: rgb()
   def kelvin_to_rgb(kelvin) when kelvin < 1000, do: kelvin_to_rgb(1000)
@@ -527,18 +527,18 @@ defmodule Pote.Converters.Advanced do
   ]
 
   @doc """
-  Encuentra el color Pantone más cercano para un color RGB.
+  Finds the closest Pantone color for an RGB color.
 
-  Usa una lista curada de colores Pantone populares y busca el match más
-  cercano usando distancia Delta E en el espacio CIELAB.
+  Uses a curated list of popular Pantone colors and searches for the closest
+  match using Delta E distance in CIELAB space.
 
-  ## Parámetros
-  - `rgb` - tupla RGB `{r, g, b}`
+  ## Parameters
+  - `rgb` - RGB tuple `{r, g, b}`
 
-  ## Retorna
-  - tupla `{nombre_pantone, distancia}` o `nil` si no hay match cercano
+  ## Returns
+  - tuple `{pantone_name, distance}` or `nil` if there is no close match
 
-  ## Ejemplo
+  ## Example
       iex> Pote.Converters.Advanced.nearest_pantone({255, 0, 0})
       {"Red 032 C", 0.0}
   """
@@ -557,10 +557,10 @@ defmodule Pote.Converters.Advanced do
   end
 
   @doc """
-  Encuentra el nombre Pantone más cercano para un color RGB.
-  Devuelve solo el nombre, o `nil` si no hay match cercano.
+  Finds the closest Pantone name for an RGB color.
+  Returns only the name, or `nil` if there is no close match.
 
-  ## Ejemplo
+  ## Example
       iex> Pote.Converters.Advanced.nearest_pantone_name({255, 0, 0})
       "Red 032 C"
   """
