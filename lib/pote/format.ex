@@ -36,70 +36,70 @@ defmodule Pote.Format do
   # ============================================================================
 
   @doc """
-  Parsea un string o valor al formato específico.
+  Parses a string or value into the specific format.
   """
   @callback parse(any()) :: {:ok, any()} | {:error, String.t()}
 
   @doc """
-  Convierte el formato a RGB.
+  Converts the format to RGB.
   """
   @callback to_rgb(t()) :: Pote.rgb()
 
   @doc """
-  Crea el formato desde RGB.
+  Creates the format from RGB.
   """
   @callback from_rgb(Pote.rgb()) :: t()
 
   @doc """
-  Valida si el valor es válido para este formato.
-  Por defecto, retorna `true` si `parse/1` succeeds.
+  Validates whether the value is valid for this format.
+  Defaults to returning `true` if `parse/1` succeeds.
   """
   @callback valid?(any()) :: boolean()
 
   @doc """
-  Convierte el formato a hexadecimal.
-  Por defecto usa `to_rgb/1` y luego `Pote.Converters.RGB.to_hex/1`.
+  Converts the format to hexadecimal.
+  Defaults to using `to_rgb/1` and then `Pote.Converters.RGB.to_hex/1`.
   """
   @callback to_hex(t()) :: String.t()
 
   @doc """
-  Convierte el formato a ARGB {a, r, g, b}.
-  Por defecto retorna {255, r, g, b}.
+  Converts the format to ARGB {a, r, g, b}.
+  Defaults to returning {255, r, g, b}.
   """
   @callback to_argb(t()) :: {0..255, 0..255, 0..255, 0..255}
 
   @doc """
-  Convierte el formato a HSL.
-  Por defecto usa `to_rgb/1` y luego `Pote.Converters.RGB.to_hsl/1`.
+  Converts the format to HSL.
+  Defaults to using `to_rgb/1` and then `Pote.Converters.RGB.to_hsl/1`.
   """
   @callback to_hsl(t()) :: Pote.hsl()
 
   @doc """
-  Convierte el formato a HSV.
-  Por defecto usa `to_rgb/1` y luego `Pote.Converters.RGB.to_hsv/1`.
+  Converts the format to HSV.
+  Defaults to using `to_rgb/1` and then `Pote.Converters.RGB.to_hsv/1`.
   """
   @callback to_hsv(t()) :: Pote.hsv()
 
   @doc """
-  Convierte el formato a CMYK.
-  Por defecto usa `to_rgb/1` y luego `Pote.Converters.RGB.to_cmyk/1`.
+  Converts the format to CMYK.
+  Defaults to using `to_rgb/1` and then `Pote.Converters.RGB.to_cmyk/1`.
   """
   @callback to_cmyk(t()) :: Pote.cmyk()
 
   @doc """
-  Convierte el formato a XTerm256.
-  Por defecto usa `to_rgb/1` y luego `Pote.Converters.RGB.to_xterm256/1`.
+  Converts the format to XTerm256.
+  Defaults to using `to_rgb/1` and then `Pote.Converters.RGB.to_xterm256/1`.
   """
   @callback to_xterm256(t()) :: Pote.xterm256()
 
   @doc """
-  Retorna el nombre del color.
-  Por defecto retorna `nil`.
+  Returns the color name.
+  Defaults to returning `nil`.
   """
   @callback name(t()) :: String.t() | nil
 
   @doc """
-  Retorna un mapa con toda la información del color.
+  Returns a map with all the information about the color.
   """
   @callback info(t()) :: map()
 
@@ -197,7 +197,7 @@ defmodule Pote.Format do
   end
 
   @doc """
-  Helper para implementar `valid?/1` basándose en `parse/1`.
+  Helper to implement `valid?/1` based on `parse/1`.
   """
   def valid_via_parse(module, input) do
     case module.parse(input) do
@@ -210,9 +210,9 @@ end
 # Pote.Format.Behaviour now simply aliases Pote.Format for backward compatibility
 defmodule Pote.Format.Behaviour do
   @moduledoc """
-  Alias de `Pote.Format` para backward compatibility.
+  Alias for `Pote.Format` for backward compatibility.
 
-  Los nuevos módulos deberían usar `use Pote.Format` en lugar de
+  New modules should use `use Pote.Format` instead of
   `use Pote.Format.Behaviour`.
   """
 

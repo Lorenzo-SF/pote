@@ -1,25 +1,25 @@
 defmodule Pote.Converters do
   @moduledoc """
-  Módulo de conversiones de color.
+  Color conversion module.
 
-  Este módulo actúa como namespace para los conversores específicos
-  y mantiene backward compatibility con `Pote.Conversions`.
+  This module acts as a namespace for the specific converters
+  and maintains backward compatibility with `Pote.Conversions`.
 
-  ## Conversores disponibles
+  ## Available converters
 
-  - `Pote.Converters.RGB` - Conversiones hacia/desde RGB
-  - `Pote.Converters.HSL` - Conversiones hacia/desde HSL
-  - `Pote.Converters.HSV` - Conversiones hacia/desde HSV
-  - `Pote.Converters.CMYK` - Conversiones hacia/desde CMYK
-  - `Pote.Converters.XTerm256` - Conversiones hacia/desde XTerm256
-  - `Pote.Converters.HWB` - Conversiones hacia/desde HWB
-  - `Pote.Converters.XYZ` - Conversiones hacia/desde CIE XYZ
-  - `Pote.Converters.LAB` - Conversiones hacia/desde CIELAB
-  - `Pote.Converters.YUV` - Conversiones hacia/desde YUV
-  - `Pote.Converters.YCbCr` - Conversiones hacia/desde YCbCr
-  - `Pote.Converters.Kelvin` - Conversiones de temperatura de color
+  - `Pote.Converters.RGB` - Conversions to/from RGB
+  - `Pote.Converters.HSL` - Conversions to/from HSL
+  - `Pote.Converters.HSV` - Conversions to/from HSV
+  - `Pote.Converters.CMYK` - Conversions to/from CMYK
+  - `Pote.Converters.XTerm256` - Conversions to/from XTerm256
+  - `Pote.Converters.HWB` - Conversions to/from HWB
+  - `Pote.Converters.XYZ` - Conversions to/from CIE XYZ
+  - `Pote.Converters.LAB` - Conversions to/from CIELAB
+  - `Pote.Converters.YUV` - Conversions to/from YUV
+  - `Pote.Converters.YCbCr` - Conversions to/from YCbCr
+  - `Pote.Converters.Kelvin` - Color temperature conversions
 
-  ## Uso
+  ## Usage
 
       iex> Pote.Converters.RGB.to_hex({255, 128, 0})
       "#FF8000"
@@ -27,15 +27,15 @@ defmodule Pote.Converters do
       iex> Pote.Converters.HSL.from_rgb({255, 128, 0})
       {30.0, 100.0, 50.0}
 
-  Para backward compatibility, las funciones de `Pote.Conversions`
-  siguen disponibles directamente en este módulo.
+  For backward compatibility, the `Pote.Conversions` functions
+  remain available directly in this module.
   """
 
   defmodule RGB do
     @moduledoc """
-    Conversiones hacia/desde RGB.
+    Conversions to/from RGB.
 
-    ## Ejemplos
+    ## Examples
 
         iex> Pote.Converters.RGB.to_hex({255, 128, 0})
         "#FF8000"
@@ -52,7 +52,7 @@ defmodule Pote.Converters do
     @type xterm256 :: Pote.xterm256()
 
     @doc """
-    Convierte RGB a hexadecimal.
+    Converts RGB to hexadecimal.
     """
     @spec to_hex(rgb()) :: hex()
     def to_hex({r, g, b}) do
@@ -67,7 +67,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Convierte hexadecimal a RGB.
+    Converts hexadecimal to RGB.
     """
     @spec from_hex(hex()) :: {:ok, rgb()} | {:error, :invalid_hex_format}
     def from_hex(hex) when is_binary(hex) do
@@ -99,7 +99,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Convierte RGB a HSL.
+    Converts RGB to HSL.
     """
     @spec to_hsl(rgb()) :: hsl()
     def to_hsl({r, g, b}) do
@@ -146,7 +146,7 @@ defmodule Pote.Converters do
     defp normalize_h(h), do: h
 
     @doc """
-    Convierte RGB a HSV.
+    Converts RGB to HSV.
     """
     @spec to_hsv(rgb()) :: hsv()
     def to_hsv({r, g, b}) do
@@ -166,7 +166,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Convierte RGB a CMYK.
+    Converts RGB to CMYK.
     """
     @spec to_cmyk(rgb()) :: cmyk()
     def to_cmyk({r, g, b}) do
@@ -188,7 +188,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Convierte RGB a XTerm256.
+    Converts RGB to XTerm256.
     """
     @spec to_xterm256(rgb()) :: xterm256()
     def to_xterm256({r, g, b}) do
@@ -224,7 +224,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Calcula la distancia Manhattan entre dos colores RGB.
+    Calculates the Manhattan distance between two RGB colors.
     """
     @spec color_distance(rgb(), rgb()) :: non_neg_integer()
     def color_distance({r1, g1, b1}, {r2, g2, b2}) do
@@ -240,7 +240,7 @@ defmodule Pote.Converters do
 
   defmodule HSL do
     @moduledoc """
-    Conversiones hacia/desde HSL.
+    Conversions to/from HSL.
     """
 
     alias Pote.Converters.HSV
@@ -249,7 +249,7 @@ defmodule Pote.Converters do
     @type hsl :: Pote.hsl()
 
     @doc """
-    Convierte HSL a RGB.
+    Converts HSL to RGB.
     """
     @spec to_rgb(hsl()) :: rgb()
     def to_rgb({h, s, l}) do
@@ -295,7 +295,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Crea HSL desde RGB.
+    Creates HSL from RGB.
     """
     @spec from_rgb(rgb()) :: hsl()
     def from_rgb(rgb), do: RGB.to_hsl(rgb)
@@ -303,7 +303,7 @@ defmodule Pote.Converters do
 
   defmodule HSV do
     @moduledoc """
-    Conversiones hacia/desde HSV.
+    Conversions to/from HSV.
     """
 
     alias Pote.Converters.HSL
@@ -312,7 +312,7 @@ defmodule Pote.Converters do
     @type hsv :: Pote.hsv()
 
     @doc """
-    Convierte HSV a RGB.
+    Converts HSV to RGB.
     """
     @spec to_rgb(hsv()) :: rgb()
     def to_rgb({h, s, v}) do
@@ -340,7 +340,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Crea HSV desde RGB.
+    Creates HSV from RGB.
     """
     @spec from_rgb(rgb()) :: hsv()
     def from_rgb(rgb), do: RGB.to_hsv(rgb)
@@ -348,14 +348,14 @@ defmodule Pote.Converters do
 
   defmodule CMYK do
     @moduledoc """
-    Conversiones hacia/desde CMYK.
+    Conversions to/from CMYK.
     """
 
     @type rgb :: Pote.rgb()
     @type cmyk :: Pote.cmyk()
 
     @doc """
-    Convierte CMYK a RGB.
+    Converts CMYK to RGB.
     """
     @spec to_rgb(cmyk()) :: rgb()
     def to_rgb({c, m, y, k}) do
@@ -372,7 +372,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Crea CMYK desde RGB.
+    Creates CMYK from RGB.
     """
     @spec from_rgb(rgb()) :: cmyk()
     def from_rgb(rgb), do: RGB.to_cmyk(rgb)
@@ -380,14 +380,14 @@ defmodule Pote.Converters do
 
   defmodule XTerm256 do
     @moduledoc """
-    Conversiones hacia/desde XTerm256.
+    Conversions to/from XTerm256.
     """
 
     @type rgb :: Pote.rgb()
     @type xterm256 :: Pote.xterm256()
 
     @doc """
-    Convierte XTerm256 a RGB.
+    Converts XTerm256 to RGB.
     """
     @spec to_rgb(xterm256()) :: rgb()
     def to_rgb(index) when index in 232..255 do
@@ -429,7 +429,7 @@ defmodule Pote.Converters do
     def to_rgb(_index), do: {0, 0, 0}
 
     @doc """
-    Crea XTerm256 desde RGB.
+    Creates XTerm256 from RGB.
     """
     @spec from_rgb(rgb()) :: xterm256()
     def from_rgb(rgb), do: RGB.to_xterm256(rgb)
@@ -437,7 +437,7 @@ defmodule Pote.Converters do
 
   defmodule HWB do
     @moduledoc """
-    Conversiones hacia/desde HWB (Hue, Whiteness, Blackness).
+    Conversions to/from HWB (Hue, Whiteness, Blackness).
     """
 
     alias Pote.Converters.HSV
@@ -446,7 +446,7 @@ defmodule Pote.Converters do
     @type hwb :: {float(), float(), float()}
 
     @doc """
-    Convierte HWB a RGB.
+    Converts HWB to RGB.
     """
     @spec to_rgb(hwb()) :: rgb()
     def to_rgb({h, w, b}) do
@@ -473,7 +473,7 @@ defmodule Pote.Converters do
     end
 
     @doc """
-    Convierte RGB a HWB.
+    Converts RGB to HWB.
     """
     @spec from_rgb(rgb()) :: hwb()
     def from_rgb({r, g, b}) do
@@ -524,69 +524,69 @@ defmodule Pote.Converters do
   end
 
   # ============================================================================
-  # Funciones de backward compatibility que delegan a Pote.Conversions
+  # Backward compatibility functions that delegate to Pote.Conversions
   # ============================================================================
 
-  # Por ahora, las funciones antiguas siguen disponibles en Pote.Conversions
-  # En el futuro podrían deprecarse en favor de estas
+  # For now, the legacy functions remain available in Pote.Conversions
+  # In the future they may be deprecated in favor of these
 
   @doc """
-  Convierte HSL a RGB (alias de `HSL.to_rgb/1`).
+  Converts HSL to RGB  (alias for `HSL.to_rgb/1`).
   """
   def hsl_to_rgb(hsl), do: HSL.to_rgb(hsl)
 
   @doc """
-  Convierte RGB a HSL (alias de `RGB.to_hsl/1`).
+  Converts RGB to HSL  (alias for `RGB.to_hsl/1`).
   """
   def rgb_to_hsl(rgb), do: RGB.to_hsl(rgb)
 
   @doc """
-  Convierte HSV a RGB (alias de `HSV.to_rgb/1`).
+  Converts HSV to RGB  (alias for `HSV.to_rgb/1`).
   """
   def hsv_to_rgb(hsv), do: HSV.to_rgb(hsv)
 
   @doc """
-  Convierte RGB a HSV (alias de `RGB.to_hsv/1`).
+  Converts RGB to HSV  (alias for `RGB.to_hsv/1`).
   """
   def rgb_to_hsv(rgb), do: RGB.to_hsv(rgb)
 
   @doc """
-  Convierte CMYK a RGB (alias de `CMYK.to_rgb/1`).
+  Converts CMYK to RGB  (alias for `CMYK.to_rgb/1`).
   """
   def cmyk_to_rgb(cmyk), do: CMYK.to_rgb(cmyk)
 
   @doc """
-  Convierte RGB a CMYK (alias de `RGB.to_cmyk/1`).
+  Converts RGB to CMYK  (alias for `RGB.to_cmyk/1`).
   """
   def rgb_to_cmyk(rgb), do: RGB.to_cmyk(rgb)
 
   @doc """
-  Convierte XTerm256 a RGB (alias de `XTerm256.to_rgb/1`).
+  Converts XTerm256 to RGB  (alias for `XTerm256.to_rgb/1`).
   """
   def xterm256_to_rgb(index), do: XTerm256.to_rgb(index)
 
   @doc """
-  Convierte RGB a XTerm256 (alias de `RGB.to_xterm256/1`).
+  Converts RGB to XTerm256  (alias for `RGB.to_xterm256/1`).
   """
   def rgb_to_xterm256(rgb), do: RGB.to_xterm256(rgb)
 
   @doc """
-  Convierte HWB a RGB (alias de `HWB.to_rgb/1`).
+  Converts HWB to RGB  (alias for `HWB.to_rgb/1`).
   """
   def hwb_to_rgb(hwb), do: HWB.to_rgb(hwb)
 
   @doc """
-  Convierte RGB a HWB (alias de `HWB.from_rgb/1`).
+  Converts RGB to HWB  (alias for `HWB.from_rgb/1`).
   """
   def rgb_to_hwb(rgb), do: HWB.from_rgb(rgb)
 
   @doc """
-  Convierte RGB a hexadecimal (alias de `RGB.to_hex/1`).
+  Converts RGB to hexadecimal  (alias for `RGB.to_hex/1`).
   """
   def rgb_to_hex(rgb), do: RGB.to_hex(rgb)
 
   @doc """
-  Convierte hexadecimal a RGB (alias de `RGB.from_hex/1`).
+  Converts hexadecimal to RGB  (alias for `RGB.from_hex/1`).
   """
   def hex_to_rgb(hex), do: RGB.from_hex(hex)
 end
