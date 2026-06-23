@@ -1,15 +1,15 @@
 defmodule Pote.Format do
   @moduledoc """
-  Behaviour for colour format handlers.
+  Behaviour for color format handlers.
 
   This module defines the contract for all color format modules.
   It provides default implementations for common conversions based
   on `to_rgb/1`.
 
-  Each colour format module (ANSI, Hex, RGB, ARGB, HSL, HSV, CMYK,
+  Each color format module (ANSI, Hex, RGB, ARGB, HSL, HSV, CMYK,
   XTerm256, Atom) implements this behaviour to provide a consistent
-  interface for colour parsing, validation, and conversion to all
-  supported colour spaces.
+  interface for color parsing, validation, and conversion to all
+  supported color spaces.
 
   See `Pote.Format.RGB`, `Pote.Format.Hex`, `Pote.Format.HSL`, etc.
   for the built-in implementations.
