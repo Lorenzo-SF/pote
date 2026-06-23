@@ -176,6 +176,10 @@ defmodule Pote.Orchestrator do
     end
   end
 
+  defp do_parse_color(input) when is_integer(input) and input in 0..255 do
+    {:ok, Conversions.xterm256_to_rgb(input)}
+  end
+
   defp do_parse_color(input) when is_atom(input) do
     case Map.get(@named_colors, input) do
       nil -> resolve_theme_color(input)
