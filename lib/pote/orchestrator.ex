@@ -176,6 +176,10 @@ defmodule Pote.Orchestrator do
     end
   end
 
+  defp do_parse_color(input) when is_integer(input) and input in 0..255 do
+    {:ok, Conversions.xterm256_to_rgb(input)}
+  end
+
   defp do_parse_color(input) when is_atom(input) do
     case Map.get(@named_colors, input) do
       nil -> resolve_theme_color(input)
@@ -252,11 +256,16 @@ defmodule Pote.Orchestrator do
     if color_name == "" do
       {:error, "theme color name cannot be empty. Example: theme:primary"}
     else
-      color_atom = String.to_atom(color_name)
+      try do
+        color_atom = String.to_existing_atom(color_name)
 
-      case Pote.get_color(color_atom) do
-        nil -> {:error, "theme color '#{color_name}' not found. Example: theme:primary"}
-        rgb -> {:ok, rgb}
+        case Pote.get_color(color_atom) do
+          nil -> {:error, "theme color '#{color_name}' not found. Example: theme:primary"}
+          rgb -> {:ok, rgb}
+        end
+      rescue
+        ArgumentError ->
+          {:error, "theme color '#{color_name}' is not a known theme key"}
       end
     end
   end

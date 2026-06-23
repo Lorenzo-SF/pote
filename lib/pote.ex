@@ -66,4 +66,29 @@ defmodule Pote do
   @doc "Returns a specific color by name (alias for get_color/1)."
   @spec color(atom()) :: {integer(), integer(), integer()} | nil
   def color(name), do: get_color(name)
+
+  @doc """
+  Parses any color input to an RGB tuple.
+
+  Accepts hex strings (`"#FF0000"`, `"FF0000"`), RGB tuples
+  (`{255, 0, 0}`), HSL/HSV tuples, atom names (`:red`, `:blue`),
+  and xterm256 integers (`0..255`).
+
+  Delegates to `Pote.Orchestrator.parse_color/1`.
+
+  Returns `{:ok, {r, g, b}}` on success, `{:error, reason}` on failure.
+  """
+  @spec parse(color_input()) :: {:ok, rgb()} | {:error, term()}
+  defdelegate parse(input), to: Pote.Orchestrator, as: :parse_color
+
+  @doc """
+  Like `parse/1` but raises on error.
+  """
+  @spec parse!(color_input()) :: rgb()
+  def parse!(input) do
+    case parse(input) do
+      {:ok, rgb} -> rgb
+      {:error, reason} -> raise ArgumentError, "invalid color #{inspect(input)}: #{inspect(reason)}"
+    end
+  end
 end
