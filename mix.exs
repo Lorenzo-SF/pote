@@ -47,7 +47,7 @@ defmodule Pote.MixProject do
       main: "readme",
       source_url: "https://github.com/Lorenzo-SF/pote",
       homepage_url: "https://github.com/Lorenzo-SF/pote",
-      extras: ["README.md", "docs/README.es.md", "LICENSE.md"], 
+      extras: ["README.md", "docs/README.es.md", "LICENSE.md"],
       groups_for_modules: [
         Core: [Pote, Pote.ColorInfo],
         Conversions: [Pote.Conversions],

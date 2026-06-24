@@ -189,7 +189,8 @@ defmodule Pote.Orchestrator do
     # silently misclassified e.g. {120.0, 50.0, 50.0} as HSL when the user
     # meant HSV. We refuse the guess and ask for a string with an explicit
     # `hsl:` / `hsv:` prefix so the intent is unambiguous.
-    {:error, "ambiguous 3-float tuple. Use the string form with an explicit prefix: \"hsl:#{h},#{s},#{l}\" or \"hsv:#{h},#{s},#{l}\""}
+    {:error,
+     "ambiguous 3-float tuple. Use the string form with an explicit prefix: \"hsl:#{h},#{s},#{l}\" or \"hsv:#{h},#{s},#{l}\""}
   end
 
   defp parse_tuple_color(_), do: :error

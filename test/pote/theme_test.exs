@@ -134,7 +134,9 @@ defmodule Pote.ThemeTest do
 
     defp pop_all_resolvers do
       case Pote.theme_resolvers() do
-        [] -> :ok
+        [] ->
+          :ok
+
         [_ | _] ->
           Pote.put_theme_resolver(:pop)
           pop_all_resolvers()
@@ -182,24 +184,24 @@ defmodule Pote.ThemeTest do
       TestHostTheme.install!(%Pote.Theme.Theme{name: "t", colors: %{"key" => {42, 42, 42}}})
       TestHostTheme.activate("t")
       TestHostTheme.register_with_pote()
-  end
-end
-
-defmodule Pote.ThemeOverrideTest do
-  use ExUnit.Case, async: false
-
-  alias Pote.Theme
-
-  defmodule CustomDirTheme do
-    use Theme,
-      config_app: :custom_dir_app,
-      defaults: %{}
-
-    def storage_dir, do: "/tmp/pote_override_test"
+    end
   end
 
-  test "storage_dir/0 can be overridden by the host module" do
-    assert CustomDirTheme.storage_dir() == "/tmp/pote_override_test"
+  defmodule Pote.ThemeOverrideTest do
+    use ExUnit.Case, async: false
+
+    alias Pote.Theme
+
+    defmodule CustomDirTheme do
+      use Theme,
+        config_app: :custom_dir_app,
+        defaults: %{}
+
+      def storage_dir, do: "/tmp/pote_override_test"
+    end
+
+    test "storage_dir/0 can be overridden by the host module" do
+      assert CustomDirTheme.storage_dir() == "/tmp/pote_override_test"
+    end
   end
-end
 end
