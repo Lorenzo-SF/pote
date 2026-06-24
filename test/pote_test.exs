@@ -59,7 +59,11 @@ defmodule PoteTest do
     end
 
     test "put_theme_resolver/1 overrides the default" do
-      Pote.put_theme_resolver(fn "custom" -> {:ok, {1, 2, 3}} end)
+      Pote.put_theme_resolver(fn
+        "custom" -> {:ok, {1, 2, 3}}
+        _ -> :not_found
+      end)
+
       try do
         assert Pote.theme_resolver().("custom") == {:ok, {1, 2, 3}}
         assert Pote.theme_resolver().("missing") == :not_found
