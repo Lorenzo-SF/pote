@@ -119,7 +119,7 @@ defmodule Pote do
   Returns `{:ok, {r, g, b}}` or `:not_found`.
   """
   @spec resolve_theme_color(String.t() | atom()) :: {:ok, rgb()} | :not_found
-  def resolve_theme_color(key) when is_atom(key) do
+  def resolve_theme_color(key) when is_atom(key) and not is_nil(key) do
     resolve_theme_color(Atom.to_string(key))
   end
 
@@ -129,17 +129,23 @@ defmodule Pote do
         result
 
       :not_found ->
-        # Use `String.to_existing_atom/1` so we never extend the atom table
-        # for arbitrary user input; if the key is not a known color name,
-        # we just return :not_found.
-        try do
-          case Map.get(@default_colors, String.to_existing_atom(key)) do
-            nil -> :not_found
-            rgb -> {:ok, rgb}
-          end
-        rescue
-          ArgumentError -> :not_found
-        end
+        resolve_default_color(key)
+    end
+  end
+
+  defp resolve_default_color(key) do
+    atom_key =
+      try do
+        String.to_existing_atom(key)
+      rescue
+        ArgumentError -> nil
+      catch
+        :error, _ -> nil
+      end
+
+    case atom_key && Map.get(@default_colors, atom_key) do
+      nil -> :not_found
+      rgb -> {:ok, rgb}
     end
   end
 
