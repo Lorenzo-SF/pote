@@ -247,13 +247,14 @@ defmodule Pote.Theme do
     defaults = opts |> Keyword.get(:defaults, %{}) |> eval_runtime_value()
     caller = __CALLER__.module
     defaults_ast = quote(do: unquote(Macro.escape(defaults)))
+    default_storage_dir = storage_dir || "~/.config/#{config_app}/themes"
 
     quote do
       alias Pote.Theme.Templates
       alias Pote.Theme.Theme
 
       @config_app unquote(config_app)
-      @storage_dir unquote(storage_dir) || "~/.config/#{unquote(config_app)}/themes"
+      @storage_dir_default unquote(default_storage_dir)
       @defaults unquote(defaults_ast)
 
       @doc """
@@ -264,13 +265,19 @@ defmodule Pote.Theme do
       """
       def config_app, do: @config_app
 
-      def storage_dir, do: @storage_dir
+      # Default storage_dir derived from the `:storage_dir` opt (or
+      # `"~/.config/<config_app>/themes"`). Host apps that need a
+      # runtime-resolved directory (e.g. honouring an env var) can
+      # define their own `storage_dir/0` in the same module.
+      defoverridable storage_dir: 0
+
+      def storage_dir, do: @storage_dir_default
 
       @doc "Lists all themes available in `storage_dir`."
       @spec list() :: [String.t()]
       def list do
         ensure_registered()
-        Pote.Theme.list_themes(@storage_dir)
+        Pote.Theme.list_themes(storage_dir())
       end
 
       @doc """
@@ -286,7 +293,7 @@ defmodule Pote.Theme do
         ensure_registered()
         name = Application.get_env(@config_app, :theme_active, "default")
 
-        case Pote.Theme.load_theme(name, @storage_dir) do
+        case Pote.Theme.load_theme(name, storage_dir()) do
           {:ok, data} ->
             %Theme{
               name: data["name"] || name,
@@ -328,7 +335,7 @@ defmodule Pote.Theme do
         Application.put_env(@config_app, :theme_active, name)
         # Re-register in case the resolver captures the active name.
         Pote.put_theme_resolver(
-          Pote.Theme.resolver(config_app: @config_app, storage_dir: @storage_dir)
+          Pote.Theme.resolver(config_app: @config_app, storage_dir: storage_dir())
         )
 
         :ok
@@ -341,7 +348,7 @@ defmodule Pote.Theme do
           # default resolver returns :not_found for anything — register ours
           _ ->
             Pote.put_theme_resolver(
-              Pote.Theme.resolver(config_app: @config_app, storage_dir: @storage_dir)
+              Pote.Theme.resolver(config_app: @config_app, storage_dir: storage_dir())
             )
         end
 
@@ -355,7 +362,7 @@ defmodule Pote.Theme do
       @spec register_with_pote() :: :ok
       def register_with_pote do
         Pote.put_theme_resolver(
-          Pote.Theme.resolver(config_app: @config_app, storage_dir: @storage_dir)
+          Pote.Theme.resolver(config_app: @config_app, storage_dir: storage_dir())
         )
 
         :ok
@@ -366,7 +373,7 @@ defmodule Pote.Theme do
       (or a name + map tuple via `install_template/2`).
       """
       @spec install!(Theme.t()) :: :ok | {:error, term()}
-      def install!(%Theme{} = theme), do: Pote.Theme.save_theme(theme, @storage_dir)
+      def install!(%Theme{} = theme), do: Pote.Theme.save_theme(theme, storage_dir())
 
       @doc """
       Installs a built-in template theme by name.

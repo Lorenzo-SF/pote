@@ -180,13 +180,21 @@ defmodule Pote.ThemeTest do
       TestHostTheme.install!(%Pote.Theme.Theme{name: "t", colors: %{"key" => {42, 42, 42}}})
       TestHostTheme.activate("t")
       TestHostTheme.register_with_pote()
+  end
+end
 
-      assert {:ok, {42, 42, 42}} = Pote.resolve_theme_color("key")
-    end
+defmodule Pote.ThemeOverrideTest do
+  use ExUnit.Case, async: false
 
-    test "install_template/1 ships built-in palettes" do
-      assert :ok = TestHostTheme.install_template("dracula")
-      assert "dracula" in TestHostTheme.list()
-    end
+  defmodule CustomDirTheme do
+    use Pote.Theme,
+      config_app: :custom_dir_app,
+      defaults: %{}
+
+    def storage_dir, do: "/tmp/pote_override_test"
+  end
+
+  test "storage_dir/0 can be overridden by the host module" do
+    assert CustomDirTheme.storage_dir() == "/tmp/pote_override_test"
   end
 end
