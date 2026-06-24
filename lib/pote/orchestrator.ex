@@ -141,22 +141,6 @@ defmodule Pote.Orchestrator do
     end
   end
 
-  defp parse_hsl_tuple(h, s, l) do
-    if h >= 0 and h <= 360 and s >= 0 and s <= 100 and l >= 0 and l <= 100 do
-      {:ok, Conversions.hsl_to_rgb({h * 1.0, s * 1.0, l * 1.0})}
-    else
-      :error
-    end
-  end
-
-  defp parse_hsv_tuple(h, s, v) do
-    if h >= 0 and h <= 360 and s >= 0 and s <= 100 and v >= 0 and v <= 100 do
-      {:ok, Conversions.hsv_to_rgb({h * 1.0, s * 1.0, v * 1.0})}
-    else
-      :error
-    end
-  end
-
   defp parse_cmyk_tuple(c, m, y, k) do
     if c >= 0 and c <= 100 and m >= 0 and m <= 100 and y >= 0 and y <= 100 and k >= 0 and k <= 100 do
       {:ok, Conversions.cmyk_to_rgb({c * 1.0, m * 1.0, y * 1.0, k * 1.0})}
