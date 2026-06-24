@@ -193,7 +193,7 @@ defmodule Pote.ThemeTest do
     alias Pote.Theme
 
     defmodule CustomDirTheme do
-      use Theme,
+      use Pote.Theme,
         config_app: :custom_dir_app,
         defaults: %{}
 
