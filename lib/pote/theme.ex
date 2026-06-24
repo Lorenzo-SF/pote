@@ -1,6 +1,6 @@
 defmodule Pote.Theme do
-  alias Pote.Theme.Theme
   alias Pote.Theme.Templates
+  alias Pote.Theme.Theme
   @moduledoc """
   A theme system that any host application can opt into.
 
@@ -249,8 +249,8 @@ defmodule Pote.Theme do
     defaults_ast = quote(do: unquote(Macro.escape(defaults)))
 
     quote do
-      alias Pote.Theme.Theme
       alias Pote.Theme.Templates
+      alias Pote.Theme.Theme
 
       @config_app unquote(config_app)
       @storage_dir unquote(storage_dir) || "~/.config/#{unquote(config_app)}/themes"
