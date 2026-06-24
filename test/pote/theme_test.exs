@@ -1,5 +1,5 @@
 defmodule Pote.ThemeTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
 
   alias Pote.Theme
 
@@ -69,7 +69,6 @@ defmodule Pote.ThemeTest do
       assert {:ok, {189, 147, 249}} = resolver.("primary")
       assert {:ok, {255, 121, 198}} = resolver.("accent")
       assert :not_found = resolver.("missing_key")
-      assert :not_found = resolver.("anything")
     end
 
     test "returns :not_found for missing theme" do
