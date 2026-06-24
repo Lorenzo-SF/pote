@@ -403,6 +403,4 @@ defmodule Pote.Theme do
       other
     end
   end
-
-  defp eval_runtime_value(other), do: other
 end
