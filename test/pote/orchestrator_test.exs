@@ -8,8 +8,12 @@ defmodule Pote.OrchestratorTest do
       assert match?({:error, _}, Orchestrator.parse_color({256, 0, 0}))
     end
 
-    test "parses HSL tuples" do
-      assert Orchestrator.parse_color({0.0, 100.0, 50.0}) == {:ok, {255, 0, 0}}
+    test "3-float tuples return :error (use hsl:/hsv: prefixes)" do
+      # After the HSL/HSV tuple ambiguity fix, the parser no longer
+      # guesses between HSL and HSV from a raw 3-float tuple. The caller
+      # must use the explicit `hsl:H,S,L` or `hsv:H,S,V` string form.
+      assert {:error, msg} = Orchestrator.parse_color({0.0, 100.0, 50.0})
+      assert msg =~ "ambiguous 3-float tuple"
     end
 
     test "parses CMYK tuples" do
