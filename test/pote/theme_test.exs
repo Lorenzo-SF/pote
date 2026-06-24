@@ -188,8 +188,10 @@ end
 defmodule Pote.ThemeOverrideTest do
   use ExUnit.Case, async: false
 
+  alias Pote.Theme
+
   defmodule CustomDirTheme do
-    use Pote.Theme,
+    use Theme,
       config_app: :custom_dir_app,
       defaults: %{}
 
