@@ -141,22 +141,6 @@ defmodule Pote.Orchestrator do
     end
   end
 
-  defp parse_hsl_tuple(h, s, l) do
-    if h >= 0 and h <= 360 and s >= 0 and s <= 100 and l >= 0 and l <= 100 do
-      {:ok, Conversions.hsl_to_rgb({h * 1.0, s * 1.0, l * 1.0})}
-    else
-      :error
-    end
-  end
-
-  defp parse_hsv_tuple(h, s, v) do
-    if h >= 0 and h <= 360 and s >= 0 and s <= 100 and v >= 0 and v <= 100 do
-      {:ok, Conversions.hsv_to_rgb({h * 1.0, s * 1.0, v * 1.0})}
-    else
-      :error
-    end
-  end
-
   defp parse_cmyk_tuple(c, m, y, k) do
     if c >= 0 and c <= 100 and m >= 0 and m <= 100 and y >= 0 and y <= 100 and k >= 0 and k <= 100 do
       {:ok, Conversions.cmyk_to_rgb({c * 1.0, m * 1.0, y * 1.0, k * 1.0})}
@@ -211,9 +195,9 @@ defmodule Pote.Orchestrator do
   defp parse_tuple_color(_), do: :error
 
   defp resolve_theme_color(color_name) do
-    case Pote.get_color(color_name) do
-      nil -> {:error, :unknown_color_format}
-      rgb -> {:ok, rgb}
+    case Pote.resolve_theme_color(color_name) do
+      {:ok, _} = result -> result
+      :not_found -> {:error, :unknown_color_format}
     end
   end
 
@@ -257,16 +241,9 @@ defmodule Pote.Orchestrator do
     if color_name == "" do
       {:error, "theme color name cannot be empty. Example: theme:primary"}
     else
-      try do
-        color_atom = String.to_existing_atom(color_name)
-
-        case Pote.get_color(color_atom) do
-          nil -> {:error, "theme color '#{color_name}' not found. Example: theme:primary"}
-          rgb -> {:ok, rgb}
-        end
-      rescue
-        ArgumentError ->
-          {:error, "theme color '#{color_name}' is not a known theme key"}
+      case Pote.resolve_theme_color(color_name) do
+        {:ok, rgb} -> {:ok, rgb}
+        :not_found -> {:error, "theme color '#{color_name}' not found. Example: theme:primary"}
       end
     end
   end
