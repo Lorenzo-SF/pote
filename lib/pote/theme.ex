@@ -1,6 +1,7 @@
 defmodule Pote.Theme do
   alias Pote.Theme.Templates
   alias Pote.Theme.Theme
+
   @moduledoc """
   A theme system that any host application can opt into.
 
@@ -319,8 +320,7 @@ defmodule Pote.Theme do
             %Theme{
               name: data["name"] || name,
               description: data["description"],
-              colors:
-                Map.new(data["colors"] || %{}, fn {k, [r, g, b]} -> {k, {r, g, b}} end)
+              colors: Map.new(data["colors"] || %{}, fn {k, [r, g, b]} -> {k, {r, g, b}} end)
             }
 
           :not_found ->
@@ -329,7 +329,9 @@ defmodule Pote.Theme do
       end
 
       @doc "Returns the colour map for the active theme."
-      @spec colors() :: %{optional(String.t()) => {non_neg_integer(), non_neg_integer(), non_neg_integer()}}
+      @spec colors() :: %{
+              optional(String.t()) => {non_neg_integer(), non_neg_integer(), non_neg_integer()}
+            }
       def colors do
         ensure_registered()
         active().colors
@@ -340,7 +342,8 @@ defmodule Pote.Theme do
 
       Returns `{:ok, {r, g, b}}` on hit, `:not_found` on miss.
       """
-      @spec color(String.t()) :: {:ok, {non_neg_integer(), non_neg_integer(), non_neg_integer()}} | :not_found
+      @spec color(String.t()) ::
+              {:ok, {non_neg_integer(), non_neg_integer(), non_neg_integer()}} | :not_found
       def color(key) when is_binary(key) do
         ensure_registered()
 
@@ -424,7 +427,8 @@ defmodule Pote.Theme do
   defp eval_runtime_value(%_{} = m), do: m
 
   defp eval_runtime_value(other) do
-    if is_tuple(other) and is_atom(elem(other, 0)) and tuple_size(other) >= 2 and is_list(elem(other, 1)) do
+    if is_tuple(other) and is_atom(elem(other, 0)) and tuple_size(other) >= 2 and
+         is_list(elem(other, 1)) do
       {result, _} = Code.eval_quoted(other)
       result
     else

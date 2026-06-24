@@ -155,8 +155,13 @@ defmodule Pote.Theme.Templates do
     }
   }
 
-  @templates %{@default.name => @default, @dracula.name => @dracula, @monokai.name => @monokai,
-               @nord.name => @nord, @light.name => @light}
+  @templates %{
+    @default.name => @default,
+    @dracula.name => @dracula,
+    @monokai.name => @monokai,
+    @nord.name => @nord,
+    @light.name => @light
+  }
 
   @doc "Returns the list of built-in template theme names."
   @spec names() :: [String.t()]

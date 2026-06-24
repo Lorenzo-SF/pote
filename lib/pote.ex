@@ -101,6 +101,7 @@ defmodule Pote do
   end
 
   defp walk_resolvers([], _key), do: :not_found
+
   defp walk_resolvers([resolver | rest], key) do
     case resolver.(key) do
       {:ok, _} = result -> result
@@ -212,8 +213,11 @@ defmodule Pote do
   @spec parse!(color_input()) :: rgb()
   def parse!(input) do
     case parse(input) do
-      {:ok, rgb} -> rgb
-      {:error, reason} -> raise ArgumentError, "invalid color #{inspect(input)}: #{inspect(reason)}"
+      {:ok, rgb} ->
+        rgb
+
+      {:error, reason} ->
+        raise ArgumentError, "invalid color #{inspect(input)}: #{inspect(reason)}"
     end
   end
 end
