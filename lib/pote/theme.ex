@@ -244,8 +244,9 @@ defmodule Pote.Theme do
   defmacro __using__(opts) do
     config_app = Keyword.fetch!(opts, :config_app)
     storage_dir = Keyword.get(opts, :storage_dir)
-    defaults = Keyword.get(opts, :defaults, %{})
+    defaults = opts |> Keyword.get(:defaults, %{}) |> eval_runtime_value()
     caller = __CALLER__.module
+    defaults_ast = quote(do: unquote(Macro.escape(defaults)))
 
     quote do
       alias Pote.Theme.Theme
@@ -253,7 +254,7 @@ defmodule Pote.Theme do
 
       @config_app unquote(config_app)
       @storage_dir unquote(storage_dir) || "~/.config/#{unquote(config_app)}/themes"
-      @defaults unquote(Macro.escape(defaults))
+      @defaults unquote(defaults_ast)
 
       @doc """
       Theme management facade for #{inspect(unquote(caller))}.
@@ -389,3 +390,19 @@ defmodule Pote.Theme do
     end
   end
 end
+
+  # Force a value (which may be either a runtime value or an AST tuple)
+  # into a runtime value. AST tuples are recognised by their first
+  # element being an atom like `%{}`, `{}`, `[]`, etc.
+  defp eval_runtime_value(%_{} = m), do: m
+
+  defp eval_runtime_value(other) do
+    if is_tuple(other) and is_atom(elem(other, 0)) and tuple_size(other) >= 2 and is_list(elem(other, 1)) do
+      {result, _} = Code.eval_quoted(other)
+      result
+    else
+      other
+    end
+  end
+
+  defp eval_runtime_value(other), do: other
