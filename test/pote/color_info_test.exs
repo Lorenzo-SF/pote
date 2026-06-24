@@ -32,9 +32,15 @@ defmodule Pote.ColorInfoTest do
       assert ci.rgb == {0, 0, 255}
     end
 
-    test "creates ColorInfo from HSL tuple" do
+    test "raw 3-float tuples no longer auto-classify as HSL" do
+      # After the HSL/HSV tuple ambiguity fix, a bare 3-float tuple
+      # cannot be turned into a ColorInfo by itself. Use the explicit
+      # string form: "hsl:30,100,50" or "hsv:30,100,50".
       ci = ColorInfo.new({30.0, 100.0, 50.0})
-      assert ci.rgb == {255, 128, 0}
+      assert ci.rgb == nil
+
+      ci_hsl = ColorInfo.new("hsl:30,100,50")
+      assert ci_hsl.rgb == {255, 128, 0}
     end
 
     test "creates ColorInfo from xterm256 string format" do
