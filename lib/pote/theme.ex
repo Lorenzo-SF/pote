@@ -1,4 +1,6 @@
 defmodule Pote.Theme do
+  alias Pote.Theme.Theme
+  alias Pote.Theme.Templates
   @moduledoc """
   A theme system that any host application can opt into.
 
@@ -242,6 +244,9 @@ defmodule Pote.Theme do
     caller = __CALLER__.module
 
     quote do
+      alias Pote.Theme.Theme
+      alias Pote.Theme.Templates
+
       @config_app unquote(config_app)
       @storage_dir unquote(storage_dir) || "~/.config/#{unquote(config_app)}/themes"
       @defaults unquote(Macro.escape(defaults))
@@ -271,14 +276,14 @@ defmodule Pote.Theme do
       built-in `default` theme when no theme is selected or the
       active file is unreadable.
       """
-      @spec active() :: Pote.Theme.Theme.t()
+      @spec active() :: Theme.t()
       def active do
         ensure_registered()
         name = Application.get_env(@config_app, :theme_active, "default")
 
         case Pote.Theme.load_theme(name, @storage_dir) do
           {:ok, data} ->
-            %Pote.Theme.Theme{
+            %Theme{
               name: data["name"] || name,
               description: data["description"],
               colors:
@@ -286,7 +291,7 @@ defmodule Pote.Theme do
             }
 
           :not_found ->
-            %Pote.Theme.Theme{name: name, description: "in-memory default", colors: @defaults}
+            %Theme{name: name, description: "in-memory default", colors: @defaults}
         end
       end
 
@@ -355,8 +360,8 @@ defmodule Pote.Theme do
       Installs a theme to disk. Accepts a `Pote.Theme.Theme` struct
       (or a name + map tuple via `install_template/2`).
       """
-      @spec install!(Pote.Theme.Theme.t()) :: :ok | {:error, term()}
-      def install!(%Pote.Theme.Theme{} = theme), do: Pote.Theme.save_theme(theme, @storage_dir)
+      @spec install!(Theme.t()) :: :ok | {:error, term()}
+      def install!(%Theme{} = theme), do: Pote.Theme.save_theme(theme, @storage_dir)
 
       @doc """
       Installs a built-in template theme by name.
@@ -366,7 +371,7 @@ defmodule Pote.Theme do
       """
       @spec install_template(String.t()) :: :ok | {:error, term()}
       def install_template(name) when is_binary(name) do
-        case Pote.Theme.Templates.fetch(name) do
+        case Templates.fetch(name) do
           {:ok, theme} -> install!(theme)
           :error -> {:error, :not_found}
         end
@@ -376,7 +381,7 @@ defmodule Pote.Theme do
       Returns the list of built-in template theme names.
       """
       @spec templates() :: [String.t()]
-      def templates, do: Pote.Theme.Templates.names()
+      def templates, do: Templates.names()
     end
   end
 end
