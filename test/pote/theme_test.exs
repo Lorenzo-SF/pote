@@ -97,12 +97,12 @@ defmodule Pote.ThemeTest do
   end
 
   describe "use Pote.Theme generates a working module" do
-    @host_tmp Path.join(System.tmp_dir!(), "pote_runtime_theme_test")
+    @host_tmp_runtime Path.join(System.tmp_dir!(), "pote_runtime_theme_test")
 
     defmodule TestHostTheme do
       use Pote.Theme,
         config_app: :test_host_app,
-        storage_dir: unquote(@host_tmp),
+        storage_dir: Path.join(System.tmp_dir!(), "pote_runtime_theme_test"),
         defaults: %{
           "primary" => {0, 0, 0},
           "accent" => {1, 1, 1}
@@ -110,11 +110,11 @@ defmodule Pote.ThemeTest do
     end
 
     setup do
-      File.mkdir_p!(@host_tmp)
+      File.mkdir_p!(@host_tmp_runtime)
       Application.delete_env(:test_host_app, :theme_active)
 
       on_exit(fn ->
-        File.rm_rf!(@host_tmp)
+        File.rm_rf!(@host_tmp_runtime)
         Application.delete_env(:test_host_app, :theme_active)
         # Pop any resolvers this describe pushed onto the stack.
         pop_all_resolvers()
