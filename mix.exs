@@ -10,7 +10,7 @@ defmodule Pote.MixProject do
       deps: deps(),
       name: "Pote",
       description:
-        "Colorimetry and theme/palette management library for Elixir — parse, convert, harmonize, and render colors across multiple color spaces.",
+        "Colorimetry and theme/palette management library for Elixir - parse, convert, harmonize, and render colors across multiple color spaces.",
       source_url: "https://github.com/Lorenzo-SF/pote",
       homepage_url: "https://github.com/Lorenzo-SF/pote",
       package: [
@@ -47,7 +47,7 @@ defmodule Pote.MixProject do
       main: "readme",
       source_url: "https://github.com/Lorenzo-SF/pote",
       homepage_url: "https://github.com/Lorenzo-SF/pote",
-      extras: ["README.md", "README_ES.md", "LICENSE.md"],
+      extras: ["README.md", "docs/README.es.md", "LICENSE.md"], 
       groups_for_modules: [
         Core: [Pote, Pote.ColorInfo],
         Conversions: [Pote.Conversions],

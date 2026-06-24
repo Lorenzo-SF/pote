@@ -333,4 +333,27 @@ defmodule Pote.OrchestratorTest do
       assert match?({:error, _}, Orchestrator.parse_color(:nonexistent_atom_xyz))
     end
   end
+
+  describe "parse_color 3-float tuple handling" do
+    # A 3-tuple of floats is ambiguous: it could be HSL {h, s, l} or HSV {h, s, v}.
+    # The old heuristic (treat as HSL if values fit in 0..100) silently
+    # misclassified tuples the user meant as HSV. We now refuse the guess and
+    # require the explicit `hsl:` / `hsv:` string prefix.
+    test "3-float tuple returns :error with actionable message" do
+      result = Orchestrator.parse_color({120.0, 50.0, 50.0})
+      assert {:error, msg} = result
+      assert msg =~ "ambiguous 3-float tuple"
+      assert msg =~ "hsl:"
+      assert msg =~ "hsv:"
+    end
+
+    test "all-integers 3-tuple still parses as RGB" do
+      assert {:ok, {255, 0, 0}} = Orchestrator.parse_color({255, 0, 0})
+    end
+
+    test "all-floats 3-tuple does not silently pick HSL" do
+      # Same shape as the old HSL guess, but should NOT be classified.
+      assert {:error, _} = Orchestrator.parse_color({120.0, 50.0, 50.0})
+    end
+  end
 end
