@@ -123,10 +123,28 @@ defmodule Pote.Theme do
   @doc """
   Returns a built-in resolver function that consults `config_app` +
   `storage_dir`. This is the function passed to `Pote.put_theme_resolver/1`.
+
+  The `storage_dir` opt can be either a string (resolved once, at
+  call time of `resolver/1`) or a 0-arity function (resolved on every
+  lookup, so the underlying directory can change between calls). The
+  generated `use Pote.Theme` module always passes a function so that
+  `defoverridable storage_dir/0` overrides take effect at lookup
+  time, not at registration time.
   """
   @spec resolver(keyword()) :: color_resolver()
   def resolver(opts) when is_list(opts) do
-    fn key -> lookup(key, opts) end
+    storage_dir_opt = Keyword.get(opts, :storage_dir)
+    resolved_opts = Keyword.delete(opts, :storage_dir)
+
+    fn key ->
+      opts_for_call =
+        case storage_dir_opt do
+          fun when is_function(fun, 0) -> Keyword.put(resolved_opts, :storage_dir, fun.())
+          other -> Keyword.put(resolved_opts, :storage_dir, other)
+        end
+
+      lookup(key, opts_for_call)
+    end
   end
 
   @doc """
@@ -268,7 +286,8 @@ defmodule Pote.Theme do
       # Default storage_dir derived from the `:storage_dir` opt (or
       # `"~/.config/<config_app>/themes"`). Host apps that need a
       # runtime-resolved directory (e.g. honouring an env var) can
-      # define their own `storage_dir/0` in the same module.
+      # define their own `storage_dir/0` in the same module to
+      # override this default.
       def storage_dir, do: @storage_dir_default
       defoverridable storage_dir: 0
 
@@ -334,7 +353,7 @@ defmodule Pote.Theme do
         Application.put_env(@config_app, :theme_active, name)
         # Re-register in case the resolver captures the active name.
         Pote.put_theme_resolver(
-          Pote.Theme.resolver(config_app: @config_app, storage_dir: storage_dir())
+          Pote.Theme.resolver(config_app: @config_app, storage_dir: fn -> storage_dir() end)
         )
 
         :ok
@@ -347,7 +366,7 @@ defmodule Pote.Theme do
           # default resolver returns :not_found for anything — register ours
           _ ->
             Pote.put_theme_resolver(
-              Pote.Theme.resolver(config_app: @config_app, storage_dir: storage_dir())
+              Pote.Theme.resolver(config_app: @config_app, storage_dir: fn -> storage_dir() end)
             )
         end
 
@@ -361,7 +380,7 @@ defmodule Pote.Theme do
       @spec register_with_pote() :: :ok
       def register_with_pote do
         Pote.put_theme_resolver(
-          Pote.Theme.resolver(config_app: @config_app, storage_dir: storage_dir())
+          Pote.Theme.resolver(config_app: @config_app, storage_dir: fn -> storage_dir() end)
         )
 
         :ok
