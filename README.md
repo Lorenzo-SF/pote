@@ -294,7 +294,95 @@ Pote.color_names()
 # => [:primary, :secondary, :ternary, ...]
 ```
 
-## Installation
+## Theming with `use Pote.Theme`
+
+Host applications can opt into a complete theme system by calling
+`use Pote.Theme`. The macro generates a facade module that owns its
+own themes on disk, integrates with Pote's resolver stack, and exposes
+the full theme management API.
+
+### Quick start
+
+```elixir
+defmodule MyApp.Theme do
+  use Pote.Theme,
+    config_app: :my_app,
+    storage_dir: "~/.config/my_app/themes",
+    defaults: %{
+      "primary" => {0, 120, 215},
+      "accent" => {255, 90, 50},
+      "background" => {24, 24, 28},
+      "text" => {240, 240, 245}
+    }
+end
+```
+
+That's it — `MyApp.Theme` now exposes:
+
+```elixir
+MyApp.Theme.list()           # => ["default", "dracula", "monokai", ...]
+MyApp.Theme.active()         # => %Pote.Theme{...}
+MyApp.Theme.activate("dracula")
+MyApp.Theme.color("primary") # => {0, 120, 215}
+MyApp.Theme.colors()         # => %{"primary" => {0, 120, 215}, ...}
+MyApp.Theme.install!(MyApp.Theme.templates().dracula)
+```
+
+### Built-in templates
+
+Five palettes ship in the box:
+
+```elixir
+MyApp.Theme.templates()
+# => ["default", "dracula", "monokai", "nord", "light"]
+
+MyApp.Theme.install_template("dracula")
+# writes ~/.config/my_app/themes/dracula.json
+```
+
+### Wiring up to `Pote.parse/1`
+
+For `"theme:<key>"` lookups to consult the active theme, the host must
+register the resolver with Pote. Calling `MyApp.Theme.register_with_pote/0`
+(or `MyApp.Theme.ensure_registered/0`, called lazily by every other
+function) pushes the resolver onto Pote's stack:
+
+```elixir
+# In your Application.start/2
+:ok = MyApp.Theme.register_with_pote()
+```
+
+From that point on, `Pote.parse("theme:primary")` reads from the active
+theme instead of Pote's hardcoded `@default_colors` palette.
+
+### Customising `storage_dir/0`
+
+Host modules can override `storage_dir/0` to read from a runtime source
+(for example, an environment variable). The macro exposes the opt value
+as the `@storage_dir_default` attribute:
+
+```elixir
+defmodule MyApp.Theme do
+  use Pote.Theme,
+    config_app: :my_app,
+    storage_dir: "~/.config/my_app/themes",
+    defaults: %{}
+
+  def storage_dir, do: System.get_env("MYAPP_THEMES_PATH") || @storage_dir_default
+end
+```
+
+`storage_dir/0` is consulted on every theme lookup, so changes to the
+underlying directory are picked up without re-registering the resolver.
+
+### Multiple consumers
+
+Pote's resolver is a **stack**, not a single function. Several apps can
+each register their own `use Pote.Theme` resolver at boot without
+overwriting each other. Each lookup walks the stack and returns the
+first non-`:not_found` hit. `Pote.put_theme_resolver(:pop)` removes the
+most recent resolver; `Pote.put_theme_resolver(nil)` clears the stack.
+
 
 Add `pote` to your list of dependencies in `mix.exs`:
 
