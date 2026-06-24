@@ -71,42 +71,83 @@ defmodule Pote do
   @type theme_resolver :: (String.t() -> {:ok, rgb()} | :not_found)
 
   @doc """
-  Returns the configured theme resolver, or a default that returns `:not_found`.
+  Returns a combined theme resolver that walks the registered stack.
 
-  Applications embedding Pote (e.g. `Alaja`) can register a custom resolver
-  to make `"theme:<key>"` lookups consult their own theme system:
+  The combined resolver tries each registered resolver in order and
+  returns the first non-`:not_found` result. If no resolver is
+  registered, returns a default that always yields `:not_found`.
+
+  Applications embedding Pote (e.g. `Alaja`) can register their own
+  resolver to make `"theme:<key>"` lookups consult their theme system:
 
       # In Alaja's startup:
-      Application.put_env(:pote, :theme_resolver, fn key ->
+      Pote.put_theme_resolver(fn key ->
         case Alaja.Config.lookup_theme_color(key) do
           {:ok, rgb} -> {:ok, rgb}
           :error -> :not_found
         end
       end)
 
-  Pote itself ships with `@default_colors` and falls back to it when the
-  custom resolver returns `:not_found`.
+  Multiple resolvers may be registered; the first one to match wins.
+  This is the recommended pattern when several apps / themes coexist
+  (e.g. in tests for multiple consumers).
   """
   @spec theme_resolver() :: theme_resolver()
   def theme_resolver do
-    Application.get_env(:pote, :theme_resolver, fn _key -> :not_found end)
+    case theme_resolvers() do
+      [] -> fn _key -> :not_found end
+      stack -> fn key -> walk_resolvers(stack, key) end
+    end
+  end
+
+  defp walk_resolvers([], _key), do: :not_found
+  defp walk_resolvers([resolver | rest], key) do
+    case resolver.(key) do
+      {:ok, _} = result -> result
+      :not_found -> walk_resolvers(rest, key)
+    end
   end
 
   @doc """
-  Registers a theme resolver at runtime. Convenience over
-  `Application.put_env/3` — useful in tests.
+  Registers a theme resolver at runtime. Multiple resolvers can coexist
+  in a stack — `resolve_theme_color/1` walks the stack and returns the
+  first non-`:not_found` result. Useful when several apps / themes are
+  loaded side-by-side (e.g. tests for multiple consumers).
 
-  Pass `nil` to restore the default (always `:not_found`) behaviour.
+  Pass `nil` to remove ALL resolvers.
+  Pass `:pop` to remove the most recently registered one.
+  Pass `:clear` as an alias for `nil`.
   """
-  @spec put_theme_resolver(theme_resolver() | nil) :: :ok
+  @spec put_theme_resolver(theme_resolver() | nil | :pop) :: :ok
   def put_theme_resolver(nil) do
-    Application.delete_env(:pote, :theme_resolver)
+    Application.delete_env(:pote, :theme_resolvers)
+    :ok
+  end
+
+  def put_theme_resolver(:pop) do
+    case Application.get_env(:pote, :theme_resolvers, []) do
+      [] -> :ok
+      [_ | rest] -> Application.put_env(:pote, :theme_resolvers, rest)
+    end
+
     :ok
   end
 
   def put_theme_resolver(fun) when is_function(fun, 1) do
-    Application.put_env(:pote, :theme_resolver, fun)
+    stack = Application.get_env(:pote, :theme_resolvers, [])
+    Application.put_env(:pote, :theme_resolvers, [fun | stack])
     :ok
+  end
+
+  @doc """
+  Returns the current list of registered theme resolvers (newest first).
+
+  The combined resolver returned by `theme_resolver/0` walks this list
+  in order until one of them returns `{:ok, _}`.
+  """
+  @spec theme_resolvers() :: [theme_resolver()]
+  def theme_resolvers do
+    Application.get_env(:pote, :theme_resolvers, [])
   end
 
   @doc """
