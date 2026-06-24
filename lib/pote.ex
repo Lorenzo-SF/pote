@@ -70,9 +70,6 @@ defmodule Pote do
   @typedoc "A theme resolver: `(key :: String.t()) -> {:ok, rgb()} | :not_found`."
   @type theme_resolver :: (String.t() -> {:ok, rgb()} | :not_found)
 
-  @typedoc "Application env key under which a custom theme resolver may be set."
-  @type theme_resolver_app :: :pote
-
   @doc """
   Returns the configured theme resolver, or a default that returns `:not_found`.
 
@@ -128,11 +125,21 @@ defmodule Pote do
 
   def resolve_theme_color(key) when is_binary(key) do
     case theme_resolver().(key) do
-      {:ok, _} = result -> result
-      :not_found -> Map.get(@default_colors, String.to_atom(key)) |> case do
-        nil -> :not_found
-        rgb -> {:ok, rgb}
-      end
+      {:ok, _} = result ->
+        result
+
+      :not_found ->
+        # Use `String.to_existing_atom/1` so we never extend the atom table
+        # for arbitrary user input; if the key is not a known color name,
+        # we just return :not_found.
+        try do
+          case Map.get(@default_colors, String.to_existing_atom(key)) do
+            nil -> :not_found
+            rgb -> {:ok, rgb}
+          end
+        rescue
+          ArgumentError -> :not_found
+        end
     end
   end
 
