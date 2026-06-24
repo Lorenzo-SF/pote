@@ -269,9 +269,8 @@ defmodule Pote.Theme do
       # `"~/.config/<config_app>/themes"`). Host apps that need a
       # runtime-resolved directory (e.g. honouring an env var) can
       # define their own `storage_dir/0` in the same module.
-      defoverridable storage_dir: 0
-
       def storage_dir, do: @storage_dir_default
+      defoverridable storage_dir: 0
 
       @doc "Lists all themes available in `storage_dir`."
       @spec list() :: [String.t()]
