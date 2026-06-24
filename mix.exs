@@ -69,7 +69,8 @@ defmodule Pote.MixProject do
         Validation: [Pote.Validator, Pote.Sanitizer],
         Orchestration: [Pote.Orchestrator],
         Themes: [Pote.Theme.Validator]
-      ]
+      ],
+      source_ref: "v0.1.0"
     ]
   end
 

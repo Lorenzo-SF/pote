@@ -210,9 +210,9 @@ defmodule Pote.Orchestrator do
   defp parse_tuple_color(_), do: :error
 
   defp resolve_theme_color(color_name) do
-    case Pote.get_color(color_name) do
-      nil -> {:error, :unknown_color_format}
-      rgb -> {:ok, rgb}
+    case Pote.resolve_theme_color(color_name) do
+      {:ok, _} = result -> result
+      :not_found -> {:error, :unknown_color_format}
     end
   end
 
@@ -256,16 +256,9 @@ defmodule Pote.Orchestrator do
     if color_name == "" do
       {:error, "theme color name cannot be empty. Example: theme:primary"}
     else
-      try do
-        color_atom = String.to_existing_atom(color_name)
-
-        case Pote.get_color(color_atom) do
-          nil -> {:error, "theme color '#{color_name}' not found. Example: theme:primary"}
-          rgb -> {:ok, rgb}
-        end
-      rescue
-        ArgumentError ->
-          {:error, "theme color '#{color_name}' is not a known theme key"}
+      case Pote.resolve_theme_color(color_name) do
+        {:ok, rgb} -> {:ok, rgb}
+        :not_found -> {:error, "theme color '#{color_name}' not found. Example: theme:primary"}
       end
     end
   end
