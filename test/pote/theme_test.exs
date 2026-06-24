@@ -3,12 +3,11 @@ defmodule Pote.ThemeTest do
 
   alias Pote.Theme
 
-  @tmp_dir Path.join(System.tmp_dir!(), "pote_theme_test_#{:erlang.unique_integer([:positive])}")
-
-  setup do
-    File.mkdir_p!(@tmp_dir)
-    on_exit(fn -> File.rm_rf!(@tmp_dir) end)
-    :ok
+  setup_all do
+    tmp_dir = Path.join(System.tmp_dir!(), "pote_theme_test_#{:erlang.unique_integer([:positive])}")
+    File.mkdir_p!(tmp_dir)
+    on_exit(fn -> File.rm_rf!(tmp_dir) end)
+    {:ok, tmp_dir: tmp_dir}
   end
 
   describe "save_theme/2 + load_theme/2 roundtrip" do
@@ -19,8 +18,8 @@ defmodule Pote.ThemeTest do
         colors: %{"primary" => {1, 2, 3}, "bg" => {10, 20, 30}}
       }
 
-      assert :ok = Theme.save_theme(theme, @tmp_dir)
-      assert {:ok, data} = Theme.load_theme("custom_test", @tmp_dir)
+      assert :ok = Theme.save_theme(theme, tmp_dir)
+      assert {:ok, data} = Theme.load_theme("custom_test", tmp_dir)
       assert data["name"] == "custom_test"
       assert data["description"] == "test theme"
       assert data["colors"]["primary"] == [1, 2, 3]
@@ -36,15 +35,15 @@ defmodule Pote.ThemeTest do
     test "lists names without .json extension" do
       Theme.save_theme(
         %Pote.Theme.Theme{name: "a", colors: %{"k" => {1, 1, 1}}},
-        @tmp_dir
+        tmp_dir
       )
 
       Theme.save_theme(
         %Pote.Theme.Theme{name: "b", colors: %{"k" => {2, 2, 2}}},
-        @tmp_dir
+        tmp_dir
       )
 
-      names = Theme.list_themes(@tmp_dir)
+      names = Theme.list_themes(tmp_dir)
       assert "a" in names
       assert "b" in names
     end
@@ -59,11 +58,11 @@ defmodule Pote.ThemeTest do
           name: "dracula",
           colors: %{"primary" => {189, 147, 249}, "accent" => {255, 121, 198}}
         },
-        @tmp_dir
+        tmp_dir
       )
 
       resolver = fn key ->
-        Theme.lookup(key, storage_dir: @tmp_dir, theme_active: "dracula")
+        Theme.lookup(key, storage_dir: tmp_dir, theme_active: "dracula")
       end
 
       assert {:ok, {189, 147, 249}} = resolver.("primary")
@@ -80,7 +79,7 @@ defmodule Pote.ThemeTest do
     test "returns a closure that consults the storage dir" do
       Theme.save_theme(
         %Pote.Theme.Theme{name: "test", colors: %{"k" => {5, 6, 7}}},
-        @tmp_dir
+        tmp_dir
       )
 
       Application.put_env(:test_resolver_app, :theme_active, "test")
@@ -89,7 +88,7 @@ defmodule Pote.ThemeTest do
       resolver =
         Theme.resolver(
           config_app: :test_resolver_app,
-          storage_dir: @tmp_dir,
+          storage_dir: tmp_dir,
           theme_active: "test"
         )
 
