@@ -67,6 +67,75 @@ defmodule Pote do
   @spec color(atom()) :: {integer(), integer(), integer()} | nil
   def color(name), do: get_color(name)
 
+  @typedoc "A theme resolver: `(key :: String.t()) -> {:ok, rgb()} | :not_found`."
+  @type theme_resolver :: (String.t() -> {:ok, rgb()} | :not_found)
+
+  @typedoc "Application env key under which a custom theme resolver may be set."
+  @type theme_resolver_app :: :pote
+
+  @doc """
+  Returns the configured theme resolver, or a default that returns `:not_found`.
+
+  Applications embedding Pote (e.g. `Alaja`) can register a custom resolver
+  to make `"theme:<key>"` lookups consult their own theme system:
+
+      # In Alaja's startup:
+      Application.put_env(:pote, :theme_resolver, fn key ->
+        case Alaja.Config.lookup_theme_color(key) do
+          {:ok, rgb} -> {:ok, rgb}
+          :error -> :not_found
+        end
+      end)
+
+  Pote itself ships with `@default_colors` and falls back to it when the
+  custom resolver returns `:not_found`.
+  """
+  @spec theme_resolver() :: theme_resolver()
+  def theme_resolver do
+    Application.get_env(:pote, :theme_resolver, fn _key -> :not_found end)
+  end
+
+  @doc """
+  Registers a theme resolver at runtime. Convenience over
+  `Application.put_env/3` — useful in tests.
+
+  Pass `nil` to restore the default (always `:not_found`) behaviour.
+  """
+  @spec put_theme_resolver(theme_resolver() | nil) :: :ok
+  def put_theme_resolver(nil) do
+    Application.delete_env(:pote, :theme_resolver)
+    :ok
+  end
+
+  def put_theme_resolver(fun) when is_function(fun, 1) do
+    Application.put_env(:pote, :theme_resolver, fun)
+    :ok
+  end
+
+  @doc """
+  Resolves a theme key (`"primary"`, `"ternary"`, ...) to an RGB tuple.
+
+  Strategy (in order):
+    1. The configured theme resolver (via `theme_resolver/0`).
+    2. Pote's built-in `@default_colors`.
+
+  Returns `{:ok, {r, g, b}}` or `:not_found`.
+  """
+  @spec resolve_theme_color(String.t() | atom()) :: {:ok, rgb()} | :not_found
+  def resolve_theme_color(key) when is_atom(key) do
+    resolve_theme_color(Atom.to_string(key))
+  end
+
+  def resolve_theme_color(key) when is_binary(key) do
+    case theme_resolver().(key) do
+      {:ok, _} = result -> result
+      :not_found -> Map.get(@default_colors, String.to_atom(key)) |> case do
+        nil -> :not_found
+        rgb -> {:ok, rgb}
+      end
+    end
+  end
+
   @doc """
   Parses any color input to an RGB tuple.
 
