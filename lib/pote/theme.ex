@@ -210,8 +210,7 @@ defmodule Pote.Theme do
          :ok <- File.write(path, json) do
       :ok
     else
-      {:error, _} = err -> err
-      other -> {:error, other}
+      err -> {:error, err}
     end
   end
 
