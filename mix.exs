@@ -68,7 +68,7 @@ defmodule Pote.MixProject do
         Display: [Pote.Display],
         Validation: [Pote.Validator, Pote.Sanitizer],
         Orchestration: [Pote.Orchestrator],
-        Themes: [Pote.Theme.Validator]
+        Themes: [Pote.Theme, Pote.Theme.Templates]
       ],
       source_ref: "v0.1.0"
     ]
@@ -76,6 +76,7 @@ defmodule Pote.MixProject do
 
   defp deps do
     [
+      {:jason, "~> 1.4"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.34", only: :dev, runtime: false},
