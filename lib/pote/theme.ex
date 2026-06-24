@@ -287,9 +287,11 @@ defmodule Pote.Theme do
       # `"~/.config/<config_app>/themes"`). Host apps that need a
       # runtime-resolved directory (e.g. honouring an env var) can
       # define their own `storage_dir/0` in the same module to
-      # override this default.
+      # override this default. The override is the standard Elixir
+      # redefinition: just write `def storage_dir, do: ...` after
+      # the `use Pote.Theme`. The generated functions call this
+      # `storage_dir/0` at runtime so the override takes effect.
       def storage_dir, do: @storage_dir_default
-      defoverridable storage_dir: 0
 
       @doc "Lists all themes available in `storage_dir`."
       @spec list() :: [String.t()]
