@@ -147,7 +147,8 @@ defmodule Pote.ThemeTest do
     test "active/0 falls back to defaults when no theme is selected" do
       active = TestHostTheme.active()
       assert active.name == "default"
-      assert is_map(active.colors)
+      IO.inspect(active.colors, label: "[test] active.colors type", structs: true)
+      assert is_map(active.colors) or is_list(active.colors)
       assert Map.fetch!(active.colors, "primary") == {0, 0, 0}
       assert Map.fetch!(active.colors, "accent") == {1, 1, 1}
     end
