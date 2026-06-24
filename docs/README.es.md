@@ -15,7 +15,7 @@ Añade `pote` a tu `mix.exs`:
 ```elixir
 def deps do
   [
-    {:pote, "~> 1.0.0"}
+    {:pote, github: "Lorenzo-SF/pote"}
   ]
 end
 ```
