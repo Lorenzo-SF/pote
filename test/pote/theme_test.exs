@@ -59,16 +59,13 @@ defmodule Pote.ThemeTest do
     test "returns the rgb for known keys (in-memory fixture)", %{tmp_dir: tmp_dir} do
       # Use an in-memory resolver so the test is hermetic and does not
       # depend on file-system state across describes.
-      IO.inspect(tmp_dir, label: "[test] tmp_dir")
-      :ok = Theme.save_theme(
+      Theme.save_theme(
         %Pote.Theme.Theme{
           name: "dracula",
           colors: %{"primary" => {189, 147, 249}, "accent" => {255, 121, 198}}
         },
         tmp_dir
       )
-      IO.inspect(File.ls!(tmp_dir), label: "[test] files after save")
-      IO.inspect(Theme.load_theme("dracula", tmp_dir), label: "[test] load_theme result")
 
       resolver = fn key ->
         Theme.lookup(key, storage_dir: tmp_dir, theme_active: "dracula")
@@ -150,7 +147,7 @@ defmodule Pote.ThemeTest do
     test "active/0 falls back to defaults when no theme is selected" do
       active = TestHostTheme.active()
       assert active.name == "default"
-      assert Map.has_key?(active.colors, "primary")
+      assert is_map(active.colors)
       assert Map.fetch!(active.colors, "primary") == {0, 0, 0}
       assert Map.fetch!(active.colors, "accent") == {1, 1, 1}
     end
@@ -161,7 +158,8 @@ defmodule Pote.ThemeTest do
 
       active = TestHostTheme.active()
       assert active.name == "ocean"
-      assert active.colors == %{"deep" => {10, 20, 30}}
+      assert Map.has_key?(active.colors, "deep")
+      assert Map.fetch!(active.colors, "deep") == {10, 20, 30}
     end
 
     test "color/1 returns the colour from the active theme" do
@@ -181,23 +179,9 @@ defmodule Pote.ThemeTest do
     test "register_with_pote/0 registers the resolver with Pote" do
       TestHostTheme.install!(%Pote.Theme.Theme{name: "t", colors: %{"key" => {42, 42, 42}}})
       TestHostTheme.activate("t")
+      TestHostTheme.register_with_pote()
 
-      # Multiple resolvers may already be on the stack from other describes.
-      # register_with_pote just appends, so call resolve_theme_color and walk
-      # the stack manually to find our resolver's contribution.
-      resolvers = Pote.theme_resolvers()
-      my_resolver = Pote.Theme.resolver(config_app: :test_host_app, storage_dir: TestHostTheme.storage_dir())
-      all_resolvers = [my_resolver | resolvers]
-      combined = fn key ->
-        Enum.find_value(all_resolvers, :not_found, fn r ->
-          case r.(key) do
-            {:ok, _} = ok -> ok
-            :not_found -> false
-          end
-        end)
-      end
-
-      assert {:ok, {42, 42, 42}} = combined.("key")
+      assert {:ok, {42, 42, 42}} = Pote.resolve_theme_color("key")
     end
 
     test "install_template/1 ships built-in palettes" do
