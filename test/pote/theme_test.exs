@@ -109,7 +109,13 @@ defmodule Pote.ThemeTest do
 
     setup do
       Application.delete_env(:test_host_app, :theme_active)
-      on_exit(fn -> Application.delete_env(:test_host_app, :theme_active) end)
+
+      on_exit(fn ->
+        Application.delete_env(:test_host_app, :theme_active)
+        # Pop any resolvers this describe pushed onto the stack.
+        while match?([_ | _], Pote.theme_resolvers()), do: Pote.put_theme_resolver(:pop)
+      end)
+
       :ok
     end
 
@@ -121,7 +127,7 @@ defmodule Pote.ThemeTest do
     test "active/0 falls back to defaults when no theme is selected" do
       active = TestHostTheme.active()
       assert active.name == "default"
-      assert Map.equal?(active.colors, %{"primary" => {0, 0, 0}, "accent" => {1, 1, 1}})
+      assert active.colors == %{"primary" => {0, 0, 0}, "accent" => {1, 1, 1}}
     end
 
     test "active/0 reads from disk when a theme is selected" do
