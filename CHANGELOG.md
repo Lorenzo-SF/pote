@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **BUG**: `Pote.Orchestrator.parse_color("theme:<key>")` and `:key` atom lookup used to ignore the host application's active theme, always returning colors from Pote's hardcoded `@default_colors`. They now consult the configured theme resolver first.
+- **BUG**: `Pote.Orchestrator.parse_color/1` accepted a 3-float tuple and silently classified it as HSL or HSV based on the value range. Two identical shapes (`{120.0, 50.0, 50.0}`) could mean either; the heuristic misclassified HSV inputs as HSL. The tuple form now returns `:error` with a message pointing to the unambiguous `hsl:` / `hsv:` string prefix. RGB and CMYK tuples are unaffected.
 
 ### Changed
 - **i18n**: translated remaining Spanish docstrings and inline comments to English across the library for consistency.
