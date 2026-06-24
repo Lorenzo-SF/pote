@@ -389,7 +389,6 @@ defmodule Pote.Theme do
       def templates, do: Templates.names()
     end
   end
-end
 
   # Force a value (which may be either a runtime value or an AST tuple)
   # into a runtime value. AST tuples are recognised by their first
@@ -406,3 +405,4 @@ end
   end
 
   defp eval_runtime_value(other), do: other
+end
