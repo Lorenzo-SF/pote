@@ -98,9 +98,13 @@ defmodule Pote.Theme do
   """
   @spec lookup(String.t(), keyword()) :: {:ok, Theme.rgb()} | :not_found
   def lookup(key, opts) when is_binary(key) and is_list(opts) do
-    config_app = Keyword.fetch!(opts, :config_app)
+    config_app = Keyword.get(opts, :config_app)
     storage_dir = Keyword.get(opts, :storage_dir)
-    theme_active = Application.get_env(config_app, :theme_active, "default")
+
+    theme_active =
+      if config_app,
+        do: Application.get_env(config_app, :theme_active, "default"),
+        else: Keyword.get(opts, :theme_active, "default")
 
     with {:ok, data} <- load_theme(theme_active, storage_dir),
          %{"colors" => colors} <- Map.get(data, "colors", %{}) do
