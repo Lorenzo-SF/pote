@@ -107,7 +107,7 @@ defmodule Pote.Theme do
         else: Keyword.get(opts, :theme_active, "default")
 
     with {:ok, data} <- load_theme(theme_active, storage_dir),
-         %{"colors" => colors} <- Map.get(data, "colors", %{}) do
+         %{"colors" => colors} <- data do
       case Map.get(colors, key) do
         [r, g, b] when is_integer(r) and is_integer(g) and is_integer(b) ->
           {:ok, {r, g, b}}
