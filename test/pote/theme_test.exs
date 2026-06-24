@@ -4,14 +4,20 @@ defmodule Pote.ThemeTest do
   alias Pote.Theme
 
   setup_all do
-    tmp_dir = Path.join(System.tmp_dir!(), "pote_theme_test_#{:erlang.unique_integer([:positive])}")
+    tmp_dir =
+      Path.join(System.tmp_dir!(), "pote_theme_test_#{:erlang.unique_integer([:positive])}")
+
     File.mkdir_p!(tmp_dir)
     on_exit(fn -> File.rm_rf!(tmp_dir) end)
     {:ok, tmp_dir: tmp_dir}
   end
 
+  setup ctx do
+    {:ok, tmp_dir: ctx.tmp_dir}
+  end
+
   describe "save_theme/2 + load_theme/2 roundtrip" do
-    test "writes and reads back a theme" do
+    test "writes and reads back a theme", %{tmp_dir: tmp_dir} do
       theme = %Pote.Theme.Theme{
         name: "custom_test",
         description: "test theme",
@@ -32,7 +38,7 @@ defmodule Pote.ThemeTest do
       assert Theme.list_themes("/does/not/exist") == []
     end
 
-    test "lists names without .json extension" do
+    test "lists names without .json extension", %{tmp_dir: tmp_dir} do
       Theme.save_theme(
         %Pote.Theme.Theme{name: "a", colors: %{"k" => {1, 1, 1}}},
         tmp_dir
@@ -50,7 +56,7 @@ defmodule Pote.ThemeTest do
   end
 
   describe "lookup/2 with a populated theme" do
-    test "returns the rgb for known keys (in-memory fixture)" do
+    test "returns the rgb for known keys (in-memory fixture)", %{tmp_dir: tmp_dir} do
       # Use an in-memory resolver so the test is hermetic and does not
       # depend on file-system state across describes.
       Theme.save_theme(
@@ -76,7 +82,7 @@ defmodule Pote.ThemeTest do
   end
 
   describe "resolver/1" do
-    test "returns a closure that consults the storage dir" do
+    test "returns a closure that consults the storage dir", %{tmp_dir: tmp_dir} do
       Theme.save_theme(
         %Pote.Theme.Theme{name: "test", colors: %{"k" => {5, 6, 7}}},
         tmp_dir
