@@ -59,13 +59,16 @@ defmodule Pote.ThemeTest do
     test "returns the rgb for known keys (in-memory fixture)", %{tmp_dir: tmp_dir} do
       # Use an in-memory resolver so the test is hermetic and does not
       # depend on file-system state across describes.
-      Theme.save_theme(
+      IO.inspect(tmp_dir, label: "[test] tmp_dir")
+      :ok = Theme.save_theme(
         %Pote.Theme.Theme{
           name: "dracula",
           colors: %{"primary" => {189, 147, 249}, "accent" => {255, 121, 198}}
         },
         tmp_dir
       )
+      IO.inspect(File.ls!(tmp_dir), label: "[test] files after save")
+      IO.inspect(Theme.load_theme("dracula", tmp_dir), label: "[test] load_theme result")
 
       resolver = fn key ->
         Theme.lookup(key, storage_dir: tmp_dir, theme_active: "dracula")
