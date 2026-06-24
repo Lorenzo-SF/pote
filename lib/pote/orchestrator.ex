@@ -200,11 +200,12 @@ defmodule Pote.Orchestrator do
   end
 
   defp parse_tuple_color({h, s, l}) when is_float(h) or is_float(s) or is_float(l) do
-    if h >= 0 and h <= 360 and s >= 0 and s <= 100 and l >= 0 and l <= 100 do
-      parse_hsl_tuple(h, s, l)
-    else
-      parse_hsv_tuple(h, s, l)
-    end
+    # A 3-tuple of floats is ambiguous: it could be HSL {h, s, l} or HSV
+    # {h, s, v}. The old heuristic (treat as HSL if all values fit in 0..100)
+    # silently misclassified e.g. {120.0, 50.0, 50.0} as HSL when the user
+    # meant HSV. We refuse the guess and ask for a string with an explicit
+    # `hsl:` / `hsv:` prefix so the intent is unambiguous.
+    {:error, "ambiguous 3-float tuple. Use the string form with an explicit prefix: \"hsl:#{h},#{s},#{l}\" or \"hsv:#{h},#{s},#{l}\""}
   end
 
   defp parse_tuple_color(_), do: :error
