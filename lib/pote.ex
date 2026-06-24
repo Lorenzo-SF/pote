@@ -133,6 +133,8 @@ defmodule Pote do
     end
   end
 
+  def resolve_theme_color(_key), do: :not_found
+
   defp resolve_default_color(key) do
     atom_key =
       try do
