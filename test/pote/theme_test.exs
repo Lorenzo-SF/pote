@@ -200,4 +200,3 @@ defmodule Pote.ThemeOverrideTest do
     assert CustomDirTheme.storage_dir() == "/tmp/pote_override_test"
   end
 end
-end
