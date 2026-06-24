@@ -114,6 +114,8 @@ defmodule Pote.ThemeTest do
           "primary" => {0, 0, 0},
           "accent" => {1, 1, 1}
         }
+
+      def storage_dir, do: @storage_dir_default
     end
 
     setup do
