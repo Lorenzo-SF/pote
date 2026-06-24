@@ -64,8 +64,11 @@ defmodule Pote.ThemeTest do
     end
 
     test "returns the rgb for known keys" do
-      assert {:ok, {189, 147, 249}} = Theme.lookup("primary", storage_dir: @tmp_dir)
-      assert {:ok, {255, 121, 198}} = Theme.lookup("accent", storage_dir: @tmp_dir)
+      assert {:ok, {189, 147, 249}} =
+               Theme.lookup("primary", storage_dir: @tmp_dir, theme_active: "dracula")
+
+      assert {:ok, {255, 121, 198}} =
+               Theme.lookup("accent", storage_dir: @tmp_dir, theme_active: "dracula")
     end
 
     test "returns :not_found for unknown keys" do
@@ -118,7 +121,7 @@ defmodule Pote.ThemeTest do
     test "active/0 falls back to defaults when no theme is selected" do
       active = TestHostTheme.active()
       assert active.name == "default"
-      assert active.colors == %{"primary" => {0, 0, 0}, "accent" => {1, 1, 1}}
+      assert Map.equal?(active.colors, %{"primary" => {0, 0, 0}, "accent" => {1, 1, 1}})
     end
 
     test "active/0 reads from disk when a theme is selected" do
