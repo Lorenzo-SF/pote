@@ -3,7 +3,7 @@
 [![Hex Version](https://img.shields.io/hexpm/v/pote.svg)](https://hex.pm/packages/pote)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3.svg)](https://hexdocs.pm/pote)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/Lorenzo-SF/pote)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/Lorenzo-SF/pote)
 
 Pote is an Elixir library for comprehensive color manipulation: parsing, conversion
 between all major color spaces, harmony generation, gradient creation, accessibility
