@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-27
+
+### Added — `Pote.Theme` heredable theme system
+- New macro-generated facade: `use Pote.Theme, config_app: :my_app`
+  creates a module like `MyApp.Theme` with `list/0`, `active/0`,
+  `activate/1`, `color/1`, `colors/0`, `install!/1`,
+  `install_template/1`, `templates/0`, `register_with_pote/0`,
+  `storage_dir/0`. Consumer apps (Alaja, Flotilla, etc.) get a
+  drop-in facade for theme management that integrates with Pote's
+  `theme:<key>` resolver stack.
+- New `Pote.Theme.Templates` module with 5 built-in themes (default,
+  dracula, monokai, nord, light). Each has the full 22-key colour
+  set (primary, secondary, ternary, quaternary, success, warning,
+  error, info, debug, happy, sad, gradient_1..6, menu, alert,
+  critical, no_color, background).
+- `Pote.Theme.save_theme/2` writes JSON in the canonical flat
+  `[r,g,b]` format (the format Pote.Theme's resolver expects).
+- `Pote.Theme.load_theme/2` reads JSON back into a `Theme` struct.
+- `Pote.Theme.resolver/1` builds a resolver function that consults
+  `Application.get_env(config_app, :theme_active)` plus a storage
+  directory.
+- `Pote.put_theme_resolver/1` now stacks resolvers — `Pote.parse`
+  walks the stack and returns the first non-`:not_found` result.
+  Useful when multiple consumers register their own resolvers
+  side-by-side.
+
+## [0.2.0] - 2026-06-24
+
 ## [0.2.0] - 2026-06-24
 
 ### Added
