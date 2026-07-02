@@ -17,7 +17,8 @@ defmodule Pote.Gradients do
   """
 
   alias Pote
-  alias Pote.Conversions
+  alias Pote.Converters
+  alias Pote.Converters.RGB
 
   @type rgb :: Pote.rgb()
   @type direction :: :left_to_right | :right_to_left | :top_to_bottom | :bottom_to_top
@@ -193,9 +194,9 @@ defmodule Pote.Gradients do
 
   Useful for analyzing or transforming gradient stops in HSL space.
   """
-  @spec to_hsl_stops([rgb()]) :: [Conversions.hsl()]
+  @spec to_hsl_stops([rgb()]) :: [Pote.hsl()]
   def to_hsl_stops(colors) do
-    Enum.map(colors, &Conversions.rgb_to_hsl/1)
+    Enum.map(colors, &Converters.rgb_to_hsl/1)
   end
 
   @spec interpolate(rgb(), rgb(), float()) :: rgb()
@@ -204,6 +205,6 @@ defmodule Pote.Gradients do
     g = round(g1 + (g2 - g1) * t)
     b = round(b1 + (b2 - b1) * t)
 
-    {Conversions.clamp(r), Conversions.clamp(g), Conversions.clamp(b)}
+    {RGB.clamp(r), RGB.clamp(g), RGB.clamp(b)}
   end
 end

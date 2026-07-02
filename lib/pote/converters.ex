@@ -2,8 +2,7 @@ defmodule Pote.Converters do
   @moduledoc """
   Color conversion module.
 
-  This module acts as a namespace for the specific converters
-  and maintains backward compatibility with `Pote.Conversions`.
+  This module acts as a namespace for the specific converters.
 
   ## Available converters
 
@@ -13,11 +12,8 @@ defmodule Pote.Converters do
   - `Pote.Converters.CMYK` - Conversions to/from CMYK
   - `Pote.Converters.XTerm256` - Conversions to/from XTerm256
   - `Pote.Converters.HWB` - Conversions to/from HWB
-  - `Pote.Converters.XYZ` - Conversions to/from CIE XYZ
-  - `Pote.Converters.LAB` - Conversions to/from CIELAB
-  - `Pote.Converters.YUV` - Conversions to/from YUV
-  - `Pote.Converters.YCbCr` - Conversions to/from YCbCr
-  - `Pote.Converters.Kelvin` - Color temperature conversions
+  - `Pote.Converters.Advanced` - XYZ, CIELAB, YUV, YCbCr, Kelvin, Pantone, and other
+    advanced colour-space and accessibility conversions
 
   ## Usage
 
@@ -26,9 +22,6 @@ defmodule Pote.Converters do
 
       iex> Pote.Converters.HSL.from_rgb({255, 128, 0})
       {30.0, 100.0, 50.0}
-
-  For backward compatibility, the `Pote.Conversions` functions
-  remain available directly in this module.
   """
 
   defmodule RGB do
@@ -524,11 +517,8 @@ defmodule Pote.Converters do
   end
 
   # ============================================================================
-  # Backward compatibility functions that delegate to Pote.Conversions
+  # Convenience top-level functions
   # ============================================================================
-
-  # For now, the legacy functions remain available in Pote.Conversions
-  # In the future they may be deprecated in favor of these
 
   @doc """
   Converts HSL to RGB  (alias for `HSL.to_rgb/1`).
