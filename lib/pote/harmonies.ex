@@ -27,7 +27,8 @@ defmodule Pote.Harmonies do
   """
 
   alias Pote
-  alias Pote.Conversions
+  alias Pote.Converters
+  alias Pote.Converters.RGB
 
   @type rgb :: Pote.rgb()
 
@@ -123,13 +124,13 @@ defmodule Pote.Harmonies do
   """
   @spec monochromatic(rgb(), pos_integer()) :: [rgb()]
   def monochromatic(rgb, steps \\ 5) do
-    {h, s, _l} = Conversions.rgb_to_hsl(rgb)
+    {h, s, _l} = Converters.rgb_to_hsl(rgb)
 
     step_size = 60.0 / (steps - 1)
 
     Enum.map(0..(steps - 1), fn i ->
       lightness = 20.0 + i * step_size
-      Conversions.hsl_to_rgb({h, s, lightness})
+      Converters.hsl_to_rgb({h, s, lightness})
     end)
   end
 
@@ -208,9 +209,9 @@ defmodule Pote.Harmonies do
 
   @spec rotate_hue(rgb(), number()) :: rgb()
   defp rotate_hue(rgb, degrees) do
-    {h, s, l} = Conversions.rgb_to_hsl(rgb)
+    {h, s, l} = Converters.rgb_to_hsl(rgb)
     new_h = :math.fmod(h + degrees + 360, 360)
-    Conversions.hsl_to_rgb({new_h, s, l})
+    Converters.hsl_to_rgb({new_h, s, l})
   end
 
   @spec mix(rgb(), rgb(), float()) :: rgb()
@@ -219,6 +220,6 @@ defmodule Pote.Harmonies do
     g = round(g1 + (g2 - g1) * amount)
     b = round(b1 + (b2 - b1) * amount)
 
-    {Conversions.clamp(r), Conversions.clamp(g), Conversions.clamp(b)}
+    {RGB.clamp(r), RGB.clamp(g), RGB.clamp(b)}
   end
 end
