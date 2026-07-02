@@ -1,8 +1,13 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Lorenzo-SF/pote/main/docs/batamantaman_pote.png" width="400" alt="Pote Mascot" />
+</p>
+
 # Pote — Colorimetría y gestión de temas para Elixir
 
 [![Versión en Hex](https://img.shields.io/hexpm/v/pote.svg)](https://hex.pm/packages/pote)
 [![Documentación Hex](https://img.shields.io/badge/hex-docs-ffaff3.svg)](https://hexdocs.pm/pote)
 [![Licencia](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE.md)
+[![Versión](https://img.shields.io/badge/versión-2.0.0-blue.svg)](https://github.com/Lorenzo-SF/pote)
 
 Pote es una biblioteca para Elixir de manipulación completa de colores: parseo,
 conversión entre todos los espacios de color principales, generación de armonías,
@@ -85,7 +90,7 @@ Pote.Gradients.apply_to_text("¡Hola mundo!", {255, 0, 0}, {0, 0, 255})
 | CIELAB     | — (salida de conversión)                 | L: 0–100, a/b: ~–128–127                  |
 | YUV        | — (salida de conversión)                 | Y: 0–255, U/V: –128–127                   |
 | YCbCr      | — (salida de conversión)                 | Y: 16–235, Cb/Cr: 16–240                  |
-| Kelvin     | `Pote.Conversions.kelvin_to_rgb(6500)`   | 1000–40000                                |
+| Kelvin     | `Pote.Converters.Advanced.kelvin_to_rgb(6500)`   | 1000–40000                         |
 
 ## Ejemplos de uso
 
@@ -117,35 +122,36 @@ Orchestrator.to_rgb!("#FF8000")
 ### Convertir entre espacios de color
 
 ```elixir
-alias Pote.Conversions
+alias Pote.Converters
+alias Pote.Converters.Advanced
 
-Conversions.rgb_to_hex({255, 128, 0})
+Converters.rgb_to_hex({255, 128, 0})
 # => "#FF8000"
 
-Conversions.rgb_to_hsl({255, 128, 0})
+Converters.rgb_to_hsl({255, 128, 0})
 # => {30.0, 100.0, 50.0}
 
-Conversions.rgb_to_cmyk({255, 128, 0})
+Converters.rgb_to_cmyk({255, 128, 0})
 # => {0.0, 49.8, 100.0, 0.0}
 
-Conversions.rgb_to_xterm256({255, 128, 0})
+Converters.rgb_to_xterm256({255, 128, 0})
 # => 208
 
-Conversions.hsl_to_rgb({30.0, 100.0, 50.0})
+Converters.hsl_to_rgb({30.0, 100.0, 50.0})
 # => {255, 128, 0}
 
 # Avanzado: temperatura de color
-Conversions.kelvin_to_rgb(6500)
+Advanced.kelvin_to_rgb(6500)
 # => {255, 249, 253}
 
-Conversions.rgb_to_kelvin({255, 160, 60})
+Advanced.rgb_to_kelvin({255, 160, 60})
 # => 3200
 
 # Avanzado: espacios de color de video
-Conversions.rgb_to_yuv({255, 128, 0})
+Advanced.to_yuv({255, 128, 0})
 # => {165, 13, 146}
 
-Conversions.rgb_to_ycbcr({255, 128, 0})
+Advanced.to_ycbcr({255, 128, 0})
 # => {165, 69, 224}
 ```
 
@@ -233,18 +239,18 @@ Gradients.vertical_fill({0, 0, 100}, {100, 0, 0}, 5, 10)
 ### Accesibilidad
 
 ```elixir
-alias Pote.Conversions
+alias Pote.Converters.Advanced
 
 # Ratio de contraste WCAG 2.1
-Conversions.contrast_ratio({255, 255, 255}, {0, 0, 0})
+Advanced.contrast_ratio({255, 255, 255}, {0, 0, 0})
 # => 21.0
 
 # Luminancia relativa WCAG 2.1
-Conversions.relative_luminance({0, 128, 0})
+Advanced.relative_luminance({0, 128, 0})
 # => 0.25016
 
 # Distancia Delta E 1976 (< 1.0 es imperceptible)
-Conversions.delta_e({255, 0, 0}, {254, 0, 0})
+Advanced.delta_e({255, 0, 0}, {254, 0, 0})
 # => ~0.4
 ```
 

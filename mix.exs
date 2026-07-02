@@ -1,10 +1,12 @@
 defmodule Pote.MixProject do
   use Mix.Project
 
+  @version "2.0.0"
+
   def project do
     [
       app: :pote,
-      version: "2.0.0",
+      version: @version,
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -45,12 +47,22 @@ defmodule Pote.MixProject do
   defp docs do
     [
       main: "readme",
+      logo: "docs/batamantaman_pote.png",
       source_url: "https://github.com/Lorenzo-SF/pote",
       homepage_url: "https://github.com/Lorenzo-SF/pote",
       extras: ["README.md", "docs/README.es.md", "LICENSE.md"],
       groups_for_modules: [
         Core: [Pote, Pote.ColorInfo],
-        Conversions: [Pote.Conversions],
+        Converters: [
+          Pote.Converters,
+          Pote.Converters.RGB,
+          Pote.Converters.HSL,
+          Pote.Converters.HSV,
+          Pote.Converters.CMYK,
+          Pote.Converters.XTerm256,
+          Pote.Converters.HWB,
+          Pote.Converters.Advanced
+        ],
         "Color Formats": [
           Pote.Format,
           Pote.Format.RGB,
@@ -70,7 +82,7 @@ defmodule Pote.MixProject do
         Orchestration: [Pote.Orchestrator],
         Themes: [Pote.Theme, Pote.Theme.Templates]
       ],
-      source_ref: "v0.1.0"
+      source_ref: @version
     ]
   end
 
