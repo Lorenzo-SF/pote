@@ -29,7 +29,7 @@ defmodule Pote.Orchestrator do
 
   alias Pote
   alias Pote.ColorInfo
-  alias Pote.Conversions
+  alias Pote.Converters
   alias Pote.Validator
 
   @type rgb :: Pote.rgb()
@@ -143,7 +143,7 @@ defmodule Pote.Orchestrator do
 
   defp parse_cmyk_tuple(c, m, y, k) do
     if c >= 0 and c <= 100 and m >= 0 and m <= 100 and y >= 0 and y <= 100 and k >= 0 and k <= 100 do
-      {:ok, Conversions.cmyk_to_rgb({c * 1.0, m * 1.0, y * 1.0, k * 1.0})}
+      {:ok, Converters.cmyk_to_rgb({c * 1.0, m * 1.0, y * 1.0, k * 1.0})}
     else
       :error
     end
@@ -161,7 +161,7 @@ defmodule Pote.Orchestrator do
   end
 
   defp do_parse_color(input) when is_integer(input) and input in 0..255 do
-    {:ok, Conversions.xterm256_to_rgb(input)}
+    {:ok, Converters.xterm256_to_rgb(input)}
   end
 
   defp do_parse_color(input) when is_atom(input) do
@@ -205,7 +205,7 @@ defmodule Pote.Orchestrator do
   defp parse_color_string(<<"#"::utf8, _rest::binary>> = input) do
     # Validate hex format before converting
     case Validator.validate(input) do
-      :ok -> Conversions.hex_to_rgb(input)
+      :ok -> Converters.hex_to_rgb(input)
       {:error, _} = err -> err
     end
   end
@@ -228,7 +228,7 @@ defmodule Pote.Orchestrator do
 
     case Integer.parse(code) do
       {val, ""} when val in 0..255 ->
-        {:ok, Conversions.xterm256_to_rgb(val)}
+        {:ok, Converters.xterm256_to_rgb(val)}
 
       _ ->
         {:error, "xterm value must be an integer 0-255. Example: xterm:202"}
@@ -255,7 +255,7 @@ defmodule Pote.Orchestrator do
     code = String.trim(code)
 
     if String.match?(code, ~r/^[0-9A-Fa-f]{6}$/) or String.match?(code, ~r/^[0-9A-Fa-f]{3}$/) do
-      Conversions.hex_to_rgb(code)
+      Converters.hex_to_rgb(code)
     else
       {:error, "hex value must be 3 or 6 hexadecimal characters. Examples: hex:FF0000, hex:F00"}
     end
@@ -312,7 +312,7 @@ defmodule Pote.Orchestrator do
              true <- h >= 0 and h <= 360,
              true <- s >= 0 and s <= 100,
              true <- l >= 0 and l <= 100 do
-          {:ok, Conversions.hsl_to_rgb({h, s, l})}
+          {:ok, Converters.hsl_to_rgb({h, s, l})}
         else
           _ -> {:error, "hsl values must be H=0-360, S=0-100, L=0-100. Example: hsl:120,50,50"}
         end
@@ -333,7 +333,7 @@ defmodule Pote.Orchestrator do
              true <- h >= 0 and h <= 360,
              true <- s >= 0 and s <= 100,
              true <- v >= 0 and v <= 100 do
-          {:ok, Conversions.hsv_to_rgb({h, s, v})}
+          {:ok, Converters.hsv_to_rgb({h, s, v})}
         else
           _ -> {:error, "hsv values must be H=0-360, S=0-100, V=0-100. Example: hsv:120,50,100"}
         end
@@ -356,7 +356,7 @@ defmodule Pote.Orchestrator do
              true <- m >= 0 and m <= 100,
              true <- y >= 0 and y <= 100,
              true <- k >= 0 and k <= 100 do
-          {:ok, Conversions.cmyk_to_rgb({c, m, y, k})}
+          {:ok, Converters.cmyk_to_rgb({c, m, y, k})}
         else
           _ -> {:error, "cmyk values must be C,M,Y,K = 0-100. Example: cmyk:100,0,50,0"}
         end
@@ -377,7 +377,7 @@ defmodule Pote.Orchestrator do
              true <- h >= 0 and h <= 360,
              true <- w >= 0 and w <= 1.0,
              true <- b >= 0 and b <= 1.0 do
-          {:ok, Conversions.hwb_to_rgb({h, w, b})}
+          {:ok, Converters.hwb_to_rgb({h, w, b})}
         else
           _ ->
             {:error, "hwb values must be H=0-360, W=0.0-1.0, B=0.0-1.0. Example: hwb:120,0.2,0.3"}
@@ -394,7 +394,7 @@ defmodule Pote.Orchestrator do
       String.match?(input, ~r/^\d+$/) ->
         case Integer.parse(input) do
           {val, ""} when val in 0..255 ->
-            {:ok, Conversions.xterm256_to_rgb(val)}
+            {:ok, Converters.xterm256_to_rgb(val)}
 
           _ ->
             {:error, "xterm value must be an integer 0-255. Example: xterm:202"}
@@ -402,11 +402,11 @@ defmodule Pote.Orchestrator do
 
       # Hex 6 chars
       String.match?(input, ~r/^[0-9A-Fa-f]{6}$/) ->
-        Conversions.hex_to_rgb(input)
+        Converters.hex_to_rgb(input)
 
       # Hex 3 chars
       String.match?(input, ~r/^[0-9A-Fa-f]{3}$/) ->
-        Conversions.hex_to_rgb(input)
+        Converters.hex_to_rgb(input)
 
       # Named colors
       true ->
@@ -567,7 +567,7 @@ defmodule Pote.Orchestrator do
   @spec to_xterm256(color_input()) :: {:ok, xterm256()} | {:error, String.t()}
   def to_xterm256(input) do
     case to_rgb(input) do
-      {:ok, rgb} -> {:ok, Conversions.rgb_to_xterm256(rgb)}
+      {:ok, rgb} -> {:ok, Converters.rgb_to_xterm256(rgb)}
       {:error, reason} -> {:error, reason}
     end
   end

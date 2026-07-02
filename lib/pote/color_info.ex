@@ -18,7 +18,8 @@ defmodule Pote.ColorInfo do
   """
 
   alias Pote.Colors.Basic
-  alias Pote.{Conversions, Harmonies, Orchestrator}
+  alias Pote.Converters.RGB
+  alias Pote.{Harmonies, Orchestrator}
 
   @type rgb :: {0..255, 0..255, 0..255}
   @type argb :: {0..255, 0..255, 0..255, 0..255}
@@ -91,7 +92,7 @@ defmodule Pote.ColorInfo do
     {name, _rgb} =
       Basic.basic_colors()
       |> Enum.min_by(fn {_name, color_rgb} ->
-        Conversions.color_distance(rgb, color_rgb)
+        RGB.color_distance(rgb, color_rgb)
       end)
 
     name
@@ -131,7 +132,7 @@ defmodule Pote.ColorInfo do
   @spec lighter(t(), number()) :: t()
   def lighter(ci, factor) do
     rgb = ci.rgb || {0, 0, 0}
-    blended = Conversions.blend(rgb, {255, 255, 255}, factor)
+    blended = RGB.blend(rgb, {255, 255, 255}, factor)
     Orchestrator.to_color_info(blended)
   end
 
@@ -139,7 +140,7 @@ defmodule Pote.ColorInfo do
   @spec darker(t(), number()) :: t()
   def darker(ci, factor) do
     rgb = ci.rgb || {255, 255, 255}
-    blended = Conversions.blend(rgb, {0, 0, 0}, factor)
+    blended = RGB.blend(rgb, {0, 0, 0}, factor)
     Orchestrator.to_color_info(blended)
   end
 
