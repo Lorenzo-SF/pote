@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-07-07
+
+### Notes
+- Version bump only. No code changes since `2.0.0`. Re-published to
+  align the `mix.exs` `version` field with the next planned Hex.pm
+  release. Keeps the canonical tag set (`1.0.0` → `2.0.0` → `2.1.0`)
+  continuous now that downstream consumers (alaja, arrea, apero,
+  candil, botica) have moved to the 2.x line.
+
 ## [2.0.0] - 2026-07-02
 
 ### Added
@@ -38,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial open source release: parsing, conversion, harmonization, gradient generation, ANSI rendering across RGB, Hex, HSL, HSV, CMYK, ARGB, XTerm256, Atom.
 
+[2.1.0]: https://hex.pm/packages/pote/2.1.0
 [2.0.0]: https://hex.pm/packages/pote/2.0.0
 [1.0.0]: https://hex.pm/packages/pote/1.0.0
 
