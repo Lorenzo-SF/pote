@@ -88,6 +88,7 @@ defmodule Pote.MixProject do
 
   defp deps do
     [
+      {:apero, path: "../apero"},
       {:jason, "~> 1.4"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
