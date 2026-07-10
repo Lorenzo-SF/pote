@@ -1,7 +1,7 @@
 defmodule Pote.MixProject do
   use Mix.Project
 
-  @version "2.1.0"
+  @version "2.2.0"
 
   def project do
     [
@@ -88,6 +88,7 @@ defmodule Pote.MixProject do
 
   defp deps do
     [
+      {:apero, "~> 3.1.0"},
       {:jason, "~> 1.4"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
