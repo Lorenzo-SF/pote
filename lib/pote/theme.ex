@@ -207,7 +207,7 @@ defmodule Pote.Theme do
            "colors" => Map.new(theme.colors, fn {k, {r, g, b}} -> {k, [r, g, b]} end)
          },
          {:ok, json} <- Jason.encode(data, pretty: true),
-         :ok <- File.write(path, json) do
+         :ok <- Apero.File.IO.atomic_write(path, json) do
       :ok
     else
       err -> {:error, err}
