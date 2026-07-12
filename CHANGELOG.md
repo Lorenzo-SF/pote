@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Refactored
+- **`Pote.Converters`** — extracted common conversion logic into
+  `Pote.Converters.Generic` module. The `Pote.Converters.Table` now
+  holds a central conversion table; individual converters delegate
+  to the generic engine. Backward-compatible — public API unchanged.
+- Added `Pote.Converters.GenericTest` for conversion correctness.
+
 ## [2.1.0] - 2026-07-07
 
 ### Notes
