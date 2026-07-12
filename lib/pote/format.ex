@@ -206,16 +206,3 @@ defmodule Pote.Format do
     end
   end
 end
-
-# Pote.Format.Behaviour now simply aliases Pote.Format for backward compatibility
-defmodule Pote.Format.Behaviour do
-  @moduledoc """
-  Alias for `Pote.Format` for backward compatibility.
-
-  New modules should use `use Pote.Format` instead of
-  `use Pote.Format.Behaviour`.
-  """
-
-  # This module exists only for backward compatibility.
-  # All implementations are in Pote.Format.
-end

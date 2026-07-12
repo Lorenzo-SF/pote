@@ -2,11 +2,12 @@ defmodule Pote.Converters do
   @moduledoc """
   Color conversion module.
 
-  This module acts as a namespace for converter wrappers that delegate to `Pote.Converters.Generic`.
+  Convenience functions that delegate to the individual converter modules (`Pote.Converters.RGB`,
+  `Pote.Converters.HSL`, etc.).
   """
 
   # Aliases for nested converter modules
-  alias Pote.Converters.{CMYK, HWB, HSL, HSV, RGB, XTerm256}
+  alias Pote.Converters.{CMYK, HSL, HSV, HWB, RGB, XTerm256}
 
   # Convenience top‑level functions that proxy to the corresponding converter modules.
   def hsl_to_rgb(hsl), do: HSL.to_rgb(hsl)

@@ -207,7 +207,7 @@ defmodule Pote.Theme do
            "colors" => Map.new(theme.colors, fn {k, {r, g, b}} -> {k, [r, g, b]} end)
          },
          {:ok, json} <- Jason.encode(data, pretty: true),
-         :ok <- Apero.File.IO.atomic_write(path, json) do
+         :ok <- atomic_write(path, json) do
       :ok
     else
       err -> {:error, err}
@@ -417,6 +417,16 @@ defmodule Pote.Theme do
       """
       @spec templates() :: [String.t()]
       def templates, do: Templates.names()
+    end
+  end
+
+  # Atomic file write: write to temp path, then rename (crash-safe)
+  defp atomic_write(path, content) do
+    tmp = path <> ".tmp.#{System.unique_integer([:positive])}"
+
+    case File.write(tmp, content) do
+      :ok -> File.rename(tmp, path)
+      error -> error
     end
   end
 
