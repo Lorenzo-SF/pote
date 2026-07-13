@@ -29,6 +29,7 @@ defmodule Pote.Orchestrator do
 
   alias Pote
   alias Pote.ColorInfo
+  alias Pote.Colors.Basic
   alias Pote.Converters
   alias Pote.Validator
 
@@ -42,45 +43,28 @@ defmodule Pote.Orchestrator do
   @type color_input :: Pote.color_input()
   @type color_output :: Pote.color_output()
 
-  @named_colors %{
-    # Basic colors
-    black: {0, 0, 0},
-    red: {255, 0, 0},
-    green: {0, 255, 0},
-    yellow: {255, 255, 0},
-    blue: {0, 0, 255},
-    magenta: {255, 0, 255},
-    cyan: {0, 255, 255},
-    white: {255, 255, 255},
-    gray: {128, 128, 128},
-    grey: {128, 128, 128},
-    bright_black: {128, 128, 128},
-    bright_red: {255, 128, 128},
-    bright_green: {128, 255, 128},
-    bright_yellow: {255, 255, 128},
-    bright_blue: {128, 128, 255},
-    bright_magenta: {255, 128, 255},
-    bright_cyan: {128, 255, 255},
-    bright_white: {255, 255, 255},
-    light_black: {128, 128, 128},
-    light_red: {255, 128, 128},
-    light_green: {128, 255, 128},
-    light_yellow: {255, 255, 128},
-    light_blue: {128, 128, 255},
-    light_magenta: {255, 128, 255},
-    light_cyan: {128, 255, 255},
-    light_white: {255, 255, 255},
-    # Theme colors - loaded dynamically
-    success: :theme_color,
-    error: :theme_color,
-    warning: :theme_color,
-    info: :theme_color,
-    debug: :theme_color,
-    happy: :theme_color,
-    sad: :theme_color,
-    critical: :theme_color,
-    alert: :theme_color
-  }
+  @named_colors Basic.named_colors()
+                |> Map.merge(%{
+                  # light_* aliases for bright_*
+                  light_black: {128, 128, 128},
+                  light_red: {255, 128, 128},
+                  light_green: {128, 255, 128},
+                  light_yellow: {255, 255, 128},
+                  light_blue: {128, 128, 255},
+                  light_magenta: {255, 128, 255},
+                  light_cyan: {128, 255, 255},
+                  light_white: {255, 255, 255},
+                  # Theme colors - loaded dynamically
+                  success: :theme_color,
+                  error: :theme_color,
+                  warning: :theme_color,
+                  info: :theme_color,
+                  debug: :theme_color,
+                  happy: :theme_color,
+                  sad: :theme_color,
+                  critical: :theme_color,
+                  alert: :theme_color
+                })
 
   @supported_formats_msg """
   Supported formats:
