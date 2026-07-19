@@ -145,6 +145,10 @@ defmodule Pote.ConvertersTest do
       result = Converters.HWB.to_rgb(hwb)
       assert result == rgb
     end
+
+    test "handles w+b near-zero without division error" do
+      assert is_tuple(Converters.HWB.to_rgb({0.0, 0.0, 0.0}))
+    end
   end
 
   describe "convenience functions" do

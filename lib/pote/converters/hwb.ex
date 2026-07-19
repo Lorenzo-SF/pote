@@ -16,7 +16,7 @@ defmodule Pote.Converters.HWB do
     b = b / 1.0
 
     if w + b >= 1.0 do
-      gray = round(w / (w + b) * 255)
+      gray = if w + b == 0.0, do: 0, else: round(w / (w + b) * 255)
       {gray, gray, gray}
     else
       {r, g, b_val} = HSV.to_rgb({h, 100.0, 100.0})
