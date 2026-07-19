@@ -19,22 +19,22 @@ defmodule Pote.Format.ANSI do
     if Basic.named_colors()[color] do
       {:ok, color}
     else
-      :error
+      {:error, "unknown ANSI color"}
     end
   end
 
   @impl true
   def parse(color) when is_binary(color), do: parse_binary_color(color)
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid ANSI color format"}
 
   defp parse_binary_color(color) do
     atom_color = String.to_existing_atom(color)
 
     if Basic.named_colors()[atom_color],
       do: {:ok, atom_color},
-      else: :error
+      else: {:error, "unknown ANSI color"}
   rescue
-    ArgumentError -> :error
+    ArgumentError -> {:error, "unknown ANSI color"}
   end
 
   @impl true

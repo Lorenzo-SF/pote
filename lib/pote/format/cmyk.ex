@@ -33,12 +33,12 @@ defmodule Pote.Format.CMYK do
         parse_cmyk_strings(c_str, m_str, y_str, k_str)
 
       _ ->
-        :error
+        {:error, "CMYK requires exactly 4 comma-separated values"}
     end
   end
 
   @impl true
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid CMYK format"}
 
   defp parse_cmyk_strings(c_str, m_str, y_str, k_str) do
     with {c, ""} <- Float.parse(c_str),
@@ -48,7 +48,7 @@ defmodule Pote.Format.CMYK do
          true <- valid_cmyk?(c, m, y, k) do
       {:ok, {c, m, y, k}}
     else
-      _ -> :error
+      _ -> {:error, "invalid CMYK values"}
     end
   end
 

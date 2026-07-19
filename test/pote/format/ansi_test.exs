@@ -12,12 +12,12 @@ defmodule Pote.Format.ANSITest do
     end
 
     test "returns error for invalid strings or non-existing atoms" do
-      assert ANSI.parse("nonexistent_ansi_color_magic") == :error
-      assert ANSI.parse(:not_a_real_ansi_color) == :error
+      assert {:error, _} = ANSI.parse("nonexistent_ansi_color_magic")
+      assert {:error, _} = ANSI.parse(:not_a_real_ansi_color)
     end
 
     test "returns error for random types" do
-      assert ANSI.parse(123) == :error
+      assert {:error, _} = ANSI.parse(123)
     end
   end
 

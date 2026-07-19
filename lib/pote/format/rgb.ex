@@ -33,16 +33,16 @@ defmodule Pote.Format.RGB do
              true <- r in 0..255 and g in 0..255 and b in 0..255 do
           {:ok, {r, g, b}}
         else
-          _ -> :error
+          _ -> {:error, "invalid RGB values"}
         end
 
       _ ->
-        :error
+        {:error, "RGB requires exactly 3 comma-separated values"}
     end
   end
 
   @impl true
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid RGB format"}
 
   @impl true
   @spec valid?(any()) :: boolean()
