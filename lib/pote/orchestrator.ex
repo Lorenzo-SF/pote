@@ -43,28 +43,27 @@ defmodule Pote.Orchestrator do
   @type color_input :: Pote.color_input()
   @type color_output :: Pote.color_output()
 
-  @named_colors Basic.named_colors()
-                |> Map.merge(%{
-                  # light_* aliases for bright_*
-                  light_black: {128, 128, 128},
-                  light_red: {255, 128, 128},
-                  light_green: {128, 255, 128},
-                  light_yellow: {255, 255, 128},
-                  light_blue: {128, 128, 255},
-                  light_magenta: {255, 128, 255},
-                  light_cyan: {128, 255, 255},
-                  light_white: {255, 255, 255},
-                  # Theme colors - loaded dynamically
-                  success: :theme_color,
-                  error: :theme_color,
-                  warning: :theme_color,
-                  info: :theme_color,
-                  debug: :theme_color,
-                  happy: :theme_color,
-                  sad: :theme_color,
-                  critical: :theme_color,
-                  alert: :theme_color
-                })
+  @named_colors_overrides %{
+    # light_* aliases for bright_*
+    light_black: {128, 128, 128},
+    light_red: {255, 128, 128},
+    light_green: {128, 255, 128},
+    light_yellow: {255, 255, 128},
+    light_blue: {128, 128, 255},
+    light_magenta: {255, 128, 255},
+    light_cyan: {128, 255, 255},
+    light_white: {255, 255, 255},
+    # Theme colors - loaded dynamically
+    success: :theme_color,
+    error: :theme_color,
+    warning: :theme_color,
+    info: :theme_color,
+    debug: :theme_color,
+    happy: :theme_color,
+    sad: :theme_color,
+    critical: :theme_color,
+    alert: :theme_color
+  }
 
   @supported_formats_msg """
   Supported formats:
@@ -149,7 +148,7 @@ defmodule Pote.Orchestrator do
   end
 
   defp do_parse_color(input) when is_atom(input) do
-    case Map.get(@named_colors, input) do
+    case Map.get(named_colors(), input) do
       nil -> resolve_theme_color(input)
       :theme_color -> resolve_theme_color(input)
       rgb -> {:ok, rgb}
@@ -566,8 +565,23 @@ defmodule Pote.Orchestrator do
   """
   @spec named_colors() :: keyword()
   def named_colors do
-    @named_colors
+    named_colors_map()
     |> Enum.map(fn {k, v} -> {k, v} end)
+  end
+
+  defp named_colors_map do
+    case Application.get_env(:pote, :named_colors) do
+      nil ->
+        Basic.named_colors()
+        |> Map.merge(@named_colors_overrides)
+
+      custom when is_map(custom) ->
+        custom
+
+      _ ->
+        Basic.named_colors()
+        |> Map.merge(@named_colors_overrides)
+    end
   end
 
   @doc """
