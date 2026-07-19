@@ -143,7 +143,7 @@ defmodule Pote.Converters.Advanced do
   end
 
   # ============================================================================
-  # Delta E (distancia de color)
+  # Delta E (color distance)
   # ============================================================================
 
   @doc """
@@ -188,7 +188,7 @@ defmodule Pote.Converters.Advanced do
   @doc """
   Calculates the WCAG 2.1 contrast ratio between two colors.
 
-  WCAG AA requiere 4.5:1 para texto normal, 7:1 para AAA.
+  WCAG AA requires 4.5:1 for normal text, 7:1 for AAA.
   """
   @spec contrast_ratio(rgb(), rgb()) :: float()
   def contrast_ratio(rgb1, rgb2) do

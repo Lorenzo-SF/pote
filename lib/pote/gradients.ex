@@ -47,9 +47,6 @@ defmodule Pote.Gradients do
     end)
   end
 
-  def linear(_from, _to, 0), do: []
-  def linear(from, _to, 1), do: [from]
-
   @doc """
   Generates a multi-stop gradient across a list of colors.
 
@@ -78,18 +75,22 @@ defmodule Pote.Gradients do
     |> Enum.chunk_every(2, 1, :discard)
     |> Enum.with_index()
     |> Enum.flat_map(fn {[from, to], segment_idx} ->
-      segment_intervals =
-        ceil((segment_idx + 1) * total_intervals / segment_count) -
-          ceil(segment_idx * total_intervals / segment_count)
+      multicolor_segment(from, to, segment_idx, segment_count, total_intervals)
+    end)
+  end
 
-      Enum.map(0..segment_intervals, fn i ->
-        t = if segment_intervals > 0, do: i / segment_intervals, else: 0.5
+  defp multicolor_segment(from, to, segment_idx, segment_count, total_intervals) do
+    intervals =
+      ceil((segment_idx + 1) * total_intervals / segment_count) -
+        ceil(segment_idx * total_intervals / segment_count)
+
+    stops =
+      Enum.map(0..intervals, fn i ->
+        t = if intervals > 0, do: i / intervals, else: 0.5
         interpolate(from, to, t)
       end)
-      |> then(fn stops ->
-        if segment_idx == segment_count - 1, do: stops, else: Enum.drop(stops, -1)
-      end)
-    end)
+
+    if segment_idx == segment_count - 1, do: stops, else: Enum.drop(stops, -1)
   end
 
   @doc """

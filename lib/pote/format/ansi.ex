@@ -6,6 +6,7 @@ defmodule Pote.Format.ANSI do
   the nearest basic color, and `Pote.ColorInfo.to_ansi/1` for ANSI escape codes.
   This module will be removed in a future version.
   """
+  @deprecated "Use Pote.Format.RGB or another format module instead"
 
   use Pote.Format
 

@@ -178,7 +178,7 @@ defmodule Pote.Converters.RGB do
   end
 
   @doc """
-  Blends dos colores RGB con un factor dado.
+  Blends two RGB colors with a given factor.
   """
   @spec blend(rgb(), rgb(), float()) :: rgb()
   def blend({r1, g1, b1}, {r2, g2, b2}, factor) do
@@ -198,7 +198,7 @@ defmodule Pote.Converters.RGB do
   end
 
   @doc """
-  Clamps un valor al rango 0-255.
+  Clamps a value to the 0-255 range.
   """
   @spec clamp(integer()) :: 0..255
   def clamp(value), do: min(max(value, 0), 255)

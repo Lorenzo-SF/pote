@@ -17,14 +17,9 @@ defmodule Pote.GradientsTest do
       assert Enum.at(grad, 2) == {0, 0, 255}
     end
 
-    test "linear/3 handles steps less than 2 safely" do
-      # Depending on implementation, minimal 2 steps or graceful fallback
-      grad0 = Gradients.linear(@red, @blue, 1)
-      assert length(grad0) == 1
-      assert Enum.at(grad0, 0) == @red
-
-      grad0 = Gradients.linear(@red, @blue, 0)
-      assert grad0 == []
+    test "linear/3 enforces minimum 2 steps" do
+      assert_raise FunctionClauseError, fn -> Gradients.linear(@red, @blue, 1) end
+      assert_raise FunctionClauseError, fn -> Gradients.linear(@red, @blue, 0) end
     end
   end
 
