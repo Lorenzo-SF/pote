@@ -41,11 +41,11 @@ defmodule Pote.SanitizerTest do
     end
 
     test "returns error for invalid list input" do
-      assert Sanitizer.sanitize_list(123, nil) == :error
+      assert {:error, _} = Sanitizer.sanitize_list(123, nil)
     end
 
     test "returns error when not a proper list with nil separator" do
-      assert Sanitizer.sanitize_list("not a list", nil) == :error
+      assert {:error, _} = Sanitizer.sanitize_list("not a list", nil)
     end
   end
 end

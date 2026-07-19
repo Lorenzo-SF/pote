@@ -25,19 +25,17 @@ defmodule Pote.Sanitizer do
   Cleans a list of strings or a delimiter-separated string.
   Useful for inputs like "360º, 50%, 50%".
   """
-  @spec sanitize_list(any(), String.t()) :: {:ok, list(String.t())} | :error
+  @spec sanitize_list(any(), String.t()) :: {:ok, list(String.t())} | {:error, String.t()}
   def sanitize_list(input, separator) when is_binary(input) do
-    case String.split(input, separator) |> Enum.map(&sanitize/1) do
-      parts -> {:ok, parts}
-    end
+    {:ok, String.split(input, separator) |> Enum.map(&sanitize/1)}
   rescue
-    _ -> :error
+    e -> {:error, Exception.message(e)}
   end
 
-  @spec sanitize_list(list(String.t()), nil) :: {:ok, list(String.t())} | :error
+  @spec sanitize_list(list(String.t()), nil) :: {:ok, list(String.t())} | {:error, String.t()}
   def sanitize_list(list, nil) when is_list(list) do
     {:ok, Enum.map(list, &sanitize/1)}
   end
 
-  def sanitize_list(_list, nil), do: :error
+  def sanitize_list(_list, nil), do: {:error, "invalid input, expected a list"}
 end
