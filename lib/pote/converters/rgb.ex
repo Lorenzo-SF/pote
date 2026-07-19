@@ -106,7 +106,6 @@ defmodule Pote.Converters.RGB do
     h
     |> Kernel.*(60.0)
     |> normalize_h()
-    |> Float.round(1)
   end
 
   defp normalize_h(h) when h < 0, do: h + 360

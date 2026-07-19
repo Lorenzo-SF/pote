@@ -44,7 +44,7 @@ defmodule Pote.Converters.Advanced do
     y = rn * 0.2126729 + gn * 0.7151522 + bn * 0.0721750
     z = rn * 0.0193339 + gn * 0.1191920 + bn * 0.9503041
 
-    {Float.round(x, 3), Float.round(y, 3), Float.round(z, 3)}
+    {x, y, z}
   end
 
   @doc """
@@ -94,7 +94,7 @@ defmodule Pote.Converters.Advanced do
     a = 500.0 * (fx - fy)
     b = 200.0 * (fy - fz)
 
-    {Float.round(l, 2), Float.round(a, 2), Float.round(b, 2)}
+    {l, a, b}
   end
 
   defp lab_f(t) do

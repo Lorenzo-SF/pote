@@ -4,6 +4,13 @@ defmodule Pote.Converters do
 
   Convenience functions that delegate to the individual converter modules (`Pote.Converters.RGB`,
   `Pote.Converters.HSL`, etc.).
+
+  ## Rounding policy
+
+  Internal converter functions preserve full float precision. Rounding is only
+  applied at the final public API boundary (e.g. output formatting, string
+  representation). This ensures roundtrip conversions (e.g. RGB → HSL → RGB)
+  are as lossless as possible given the inherent quantization of 8-bit RGB.
   """
 
   # Aliases for nested converter modules
