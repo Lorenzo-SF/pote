@@ -365,12 +365,12 @@ defmodule Pote.Theme do
       @doc false
       @spec ensure_registered() :: :ok
       def ensure_registered do
-        case Pote.theme_resolver() do
-          # default resolver returns :not_found for anything — register ours
-          _ ->
-            Pote.put_theme_resolver(
-              Pote.Theme.resolver(config_app: @config_app, storage_dir: fn -> storage_dir() end)
-            )
+        unless Process.get({__MODULE__, :pote_registered}) do
+          Pote.put_theme_resolver(
+            Pote.Theme.resolver(config_app: @config_app, storage_dir: fn -> storage_dir() end)
+          )
+
+          Process.put({__MODULE__, :pote_registered}, true)
         end
 
         :ok
