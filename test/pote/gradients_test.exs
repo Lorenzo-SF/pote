@@ -1,5 +1,6 @@
 defmodule Pote.GradientsTest do
   use ExUnit.Case
+  use ExUnitProperties
   alias Pote.Gradients
 
   @red {255, 0, 0}
@@ -50,6 +51,36 @@ defmodule Pote.GradientsTest do
     test "multicolor/2 handles short lists safely" do
       assert Gradients.multicolor([@red], 3) == [@red]
       assert Gradients.multicolor([], 5) == []
+    end
+
+    property "multicolor/2 produces exactly N stops for any color count and step count" do
+      check all(
+              color_count <- integer(2..6),
+              colors <- list_of(integer(0..255), length: color_count * 3),
+              steps <- integer(2..20)
+            ) do
+        rgb_colors =
+          colors
+          |> Enum.chunk_every(3)
+          |> Enum.map(fn [r, g, b] -> {r, g, b} end)
+
+        result = Gradients.multicolor(rgb_colors, steps)
+        assert length(result) == steps
+      end
+    end
+
+    test "multicolor/2 with steps=2 returns just the endpoints" do
+      result = Gradients.multicolor([@red, @green, @blue], 2)
+      assert length(result) == 2
+      assert Enum.at(result, 0) == @red
+      assert Enum.at(result, 1) == @blue
+    end
+
+    test "multicolor/2 with steps=3 returns first, middle, last" do
+      result = Gradients.multicolor([@red, @green, @blue], 3)
+      assert length(result) == 3
+      assert Enum.at(result, 0) == @red
+      assert Enum.at(result, 2) == @blue
     end
   end
 
