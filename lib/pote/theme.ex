@@ -185,8 +185,6 @@ defmodule Pote.Theme do
     result
   rescue
     _ -> :not_found
-  catch
-    _, _ -> :not_found
   end
 
   @doc """
