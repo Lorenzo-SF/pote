@@ -7,9 +7,8 @@ defmodule Pote.PropertyTest do
   use ExUnit.Case, async: true
   use ExUnitProperties
 
-  alias Pote.Converters.HSL
-  alias Pote.Converters.HSV
-  alias Pote.Converters.RGB
+  alias Pote.Converters
+  alias Pote.Converters.{Advanced, CMYK, HSL, HSV, HWB, RGB}
 
   describe "RGB roundtrips" do
     property "rgb → hex → rgb" do
@@ -48,6 +47,49 @@ defmodule Pote.PropertyTest do
         assert abs(r - r2) <= 1, "R: #{r} vs #{r2}"
         assert abs(g - g2) <= 1, "G: #{g} vs #{g2}"
         assert abs(b - b2) <= 1, "B: #{b} vs #{b2}"
+      end
+    end
+
+    property "rgb → cmyk → rgb (tolerancia 1 por canal)" do
+      check all(
+              r <- integer(0..255),
+              g <- integer(0..255),
+              b <- integer(0..255)
+            ) do
+        cmyk = RGB.to_cmyk({r, g, b})
+        {r2, g2, b2} = CMYK.to_rgb(cmyk)
+        assert abs(r - r2) <= 1, "R: #{r} vs #{r2}"
+        assert abs(g - g2) <= 1, "G: #{g} vs #{g2}"
+        assert abs(b - b2) <= 1, "B: #{b} vs #{b2}"
+      end
+    end
+
+    property "rgb → hwb → rgb (tolerancia 1 por canal)" do
+      check all(
+              r <- integer(0..255),
+              g <- integer(0..255),
+              b <- integer(0..255)
+            ) do
+        hwb = HWB.from_rgb({r, g, b})
+        {r2, g2, b2} = HWB.to_rgb(hwb)
+        assert abs(r - r2) <= 1, "R: #{r} vs #{r2}"
+        assert abs(g - g2) <= 1, "G: #{g} vs #{g2}"
+        assert abs(b - b2) <= 1, "B: #{b} vs #{b2}"
+      end
+    end
+
+    property "contrast_ratio(a, b) == contrast_ratio(b, a)" do
+      check all(
+              r1 <- integer(0..255),
+              g1 <- integer(0..255),
+              b1 <- integer(0..255),
+              r2 <- integer(0..255),
+              g2 <- integer(0..255),
+              b2 <- integer(0..255)
+            ) do
+        a = {r1, g1, b1}
+        b = {r2, g2, b2}
+        assert Advanced.contrast_ratio(a, b) == Advanced.contrast_ratio(b, a)
       end
     end
   end
