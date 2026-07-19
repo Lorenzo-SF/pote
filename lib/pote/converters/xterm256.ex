@@ -11,6 +11,7 @@ defmodule Pote.Converters.XTerm256 do
   Converts XTerm256 to RGB.
   """
   @spec to_rgb(xterm256()) :: rgb()
+  # gray formula verified against spec: produces 8, 18, ..., 238 (24 levels)
   def to_rgb(index) when index in 232..255 do
     gray = (index - 232) * 10 + 8
     {gray, gray, gray}

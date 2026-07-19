@@ -195,20 +195,26 @@ defmodule Pote.Theme do
   """
   @spec save_theme(Theme.t(), String.t() | nil) :: :ok | {:error, term()}
   def save_theme(%Theme{} = theme, storage_dir) do
-    dir = expand_path(storage_dir) || ""
+    dir = expand_path(storage_dir)
 
-    with :ok <- File.mkdir_p(dir),
-         path <- Path.join(dir, "#{theme.name}.json"),
-         data <- %{
-           "name" => theme.name,
-           "description" => theme.description,
-           "colors" => Map.new(theme.colors, fn {k, {r, g, b}} -> {k, [r, g, b]} end)
-         },
-         {:ok, json} <- Jason.encode(data, pretty: true),
-         :ok <- atomic_write(path, json) do
-      :ok
-    else
-      err -> {:error, err}
+    cond do
+      is_nil(dir) or dir == "" ->
+        {:error, "storage_dir must be a valid directory path"}
+
+      true ->
+        with :ok <- File.mkdir_p(dir),
+             path <- Path.join(dir, "#{theme.name}.json"),
+             data <- %{
+               "name" => theme.name,
+               "description" => theme.description,
+               "colors" => Map.new(theme.colors, fn {k, {r, g, b}} -> {k, [r, g, b]} end)
+             },
+             {:ok, json} <- Jason.encode(data, pretty: true),
+             :ok <- atomic_write(path, json) do
+          :ok
+        else
+          err -> {:error, err}
+        end
     end
   end
 
