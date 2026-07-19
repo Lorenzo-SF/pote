@@ -148,7 +148,7 @@ defmodule Pote.Orchestrator do
   end
 
   defp do_parse_color(input) when is_atom(input) do
-    case Map.get(named_colors(), input) do
+    case Map.get(named_colors_map(), input) do
       nil -> resolve_theme_color(input)
       :theme_color -> resolve_theme_color(input)
       rgb -> {:ok, rgb}
