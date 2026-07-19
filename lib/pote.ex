@@ -183,8 +183,6 @@ defmodule Pote do
         String.to_existing_atom(key)
       rescue
         ArgumentError -> nil
-      catch
-        :error, _ -> nil
       end
 
     case atom_key && Map.get(@default_colors, atom_key) do
