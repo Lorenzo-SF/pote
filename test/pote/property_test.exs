@@ -78,6 +78,20 @@ defmodule Pote.PropertyTest do
       end
     end
 
+    property "cmyk components are always in [0, 100]" do
+      check all(
+              r <- integer(0..255),
+              g <- integer(0..255),
+              b <- integer(0..255)
+            ) do
+        {c, m, y, k} = RGB.to_cmyk({r, g, b})
+        assert c >= 0 and c <= 100, "C: #{c}"
+        assert m >= 0 and m <= 100, "M: #{m}"
+        assert y >= 0 and y <= 100, "Y: #{y}"
+        assert k >= 0 and k <= 100, "K: #{k}"
+      end
+    end
+
     property "contrast_ratio(a, b) == contrast_ratio(b, a)" do
       check all(
               r1 <- integer(0..255),
