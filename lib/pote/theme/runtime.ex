@@ -8,7 +8,7 @@ defmodule Pote.Theme.Runtime do
   to override `storage_dir/0` freely without any macro recompilation.
   """
 
-  alias Pote.Theme.{Theme, Templates}
+  alias Pote.Theme.{Templates, Theme}
 
   @doc "Lists all themes available in `storage_dir`."
   @spec list(module()) :: [String.t()]

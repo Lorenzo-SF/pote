@@ -7,7 +7,6 @@ defmodule Pote.PropertyTest do
   use ExUnit.Case, async: true
   use ExUnitProperties
 
-  alias Pote.Converters
   alias Pote.Converters.{Advanced, CMYK, HSL, HSV, HWB, RGB}
 
   describe "RGB roundtrips" do
