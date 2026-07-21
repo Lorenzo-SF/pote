@@ -60,19 +60,19 @@ defmodule Pote.Validator do
     if String.contains?(code, "{") or String.contains?(code, "}") do
       case format do
         "rgb" ->
-          {:error, "Use rgb:R,G,B (parentheses), not rgb:{R,G,B}"}
+          {:error, :rgb_uses_curly_braces, "Use rgb:R,G,B (parentheses), not rgb:{R,G,B}"}
 
         "argb" ->
-          {:error, "Use argb:A,R,G,B (parentheses), not argb:{A,R,G,B}"}
+          {:error, :argb_uses_curly_braces, "Use argb:A,R,G,B (parentheses), not argb:{A,R,G,B}"}
 
         "hsl" ->
-          {:error, "Use hsl:H,S,L (parentheses), not hsl:{H,S,L}"}
+          {:error, :hsl_uses_curly_braces, "Use hsl:H,S,L (parentheses), not hsl:{H,S,L}"}
 
         "hsv" ->
-          {:error, "Use hsv:H,S,V (parentheses), not hsv:{H,S,V}"}
+          {:error, :hsv_uses_curly_braces, "Use hsv:H,S,V (parentheses), not hsv:{H,S,V}"}
 
         "cmyk" ->
-          {:error, "Use cmyk:C,M,Y,K (parentheses), not cmyk:{C,M,Y,K}"}
+          {:error, :cmyk_uses_curly_braces, "Use cmyk:C,M,Y,K (parentheses), not cmyk:{C,M,Y,K}"}
 
         _ ->
           nil
