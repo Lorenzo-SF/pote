@@ -72,7 +72,6 @@ defmodule Pote.MixProject do
           Pote.Format.CMYK,
           Pote.Format.ARGB,
           Pote.Format.Atom,
-          Pote.Format.ANSI,
           Pote.Format.XTerm256
         ],
         Harmonies: [Pote.Harmonies],
