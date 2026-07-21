@@ -68,15 +68,23 @@ defmodule Pote.Gradients do
   def multicolor([color], _steps), do: [color]
 
   def multicolor(colors, steps) when length(colors) >= 2 do
-    segment_count = length(colors) - 1
-    total_intervals = steps - 1
+    n = length(colors)
 
-    colors
-    |> Enum.chunk_every(2, 1, :discard)
-    |> Enum.with_index()
-    |> Enum.flat_map(fn {[from, to], segment_idx} ->
-      multicolor_segment(from, to, segment_idx, segment_count, total_intervals)
-    end)
+    if steps < n do
+      Enum.map(0..(steps - 1), fn i ->
+        Enum.at(colors, round(i * (n - 1) / (steps - 1)))
+      end)
+    else
+      segment_count = n - 1
+      total_intervals = steps - 1
+
+      colors
+      |> Enum.chunk_every(2, 1, :discard)
+      |> Enum.with_index()
+      |> Enum.flat_map(fn {[from, to], segment_idx} ->
+        multicolor_segment(from, to, segment_idx, segment_count, total_intervals)
+      end)
+    end
   end
 
   defp multicolor_segment(from, to, segment_idx, segment_count, total_intervals) do
