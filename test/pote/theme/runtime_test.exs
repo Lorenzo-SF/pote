@@ -5,7 +5,10 @@ defmodule Pote.Theme.RuntimeTest do
 
   setup_all do
     tmp_dir =
-      Path.join(System.tmp_dir!(), "pote_runtime_direct_test_#{:erlang.unique_integer([:positive])}")
+      Path.join(
+        System.tmp_dir!(),
+        "pote_runtime_direct_test_#{:erlang.unique_integer([:positive])}"
+      )
 
     File.mkdir_p!(tmp_dir)
     on_exit(fn -> File.rm_rf!(tmp_dir) end)
@@ -18,7 +21,10 @@ defmodule Pote.Theme.RuntimeTest do
 
   defmodule TestHost do
     def config_app, do: :test_runtime_app
-    def storage_dir, do: Application.get_env(:test_runtime_app, :storage_dir, "/tmp/pote_runtime_default")
+
+    def storage_dir,
+      do: Application.get_env(:test_runtime_app, :storage_dir, "/tmp/pote_runtime_default")
+
     def defaults, do: %{"primary" => {255, 0, 0}, "accent" => {0, 255, 0}}
   end
 
@@ -37,7 +43,9 @@ defmodule Pote.Theme.RuntimeTest do
 
   defp pop_all_resolvers do
     case Pote.theme_resolvers() do
-      [] -> :ok
+      [] ->
+        :ok
+
       [_ | _] ->
         Pote.put_theme_resolver(:pop)
         pop_all_resolvers()

@@ -398,6 +398,9 @@ defmodule Pote.Orchestrator do
   end
 
   defp parse_named_color(input) do
+    # Ensure named_colors_map is loaded first so all atoms exist
+    named_colors_map()
+
     atom = String.to_existing_atom(input)
 
     case do_parse_color(atom) do

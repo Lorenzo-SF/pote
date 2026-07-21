@@ -66,7 +66,10 @@ defmodule Pote.Theme.Runtime do
     Application.put_env(host_module.config_app(), :theme_active, name)
 
     Pote.put_theme_resolver(
-      Pote.Theme.resolver(config_app: host_module.config_app(), storage_dir: fn -> host_module.storage_dir() end)
+      Pote.Theme.resolver(
+        config_app: host_module.config_app(),
+        storage_dir: fn -> host_module.storage_dir() end
+      )
     )
 
     :ok
@@ -77,7 +80,10 @@ defmodule Pote.Theme.Runtime do
   def ensure_registered(host_module) do
     unless Process.get({host_module, :pote_registered}) do
       Pote.put_theme_resolver(
-        Pote.Theme.resolver(config_app: host_module.config_app(), storage_dir: fn -> host_module.storage_dir() end)
+        Pote.Theme.resolver(
+          config_app: host_module.config_app(),
+          storage_dir: fn -> host_module.storage_dir() end
+        )
       )
 
       Process.put({host_module, :pote_registered}, true)
@@ -93,7 +99,10 @@ defmodule Pote.Theme.Runtime do
   @spec register_with_pote(module()) :: :ok
   def register_with_pote(host_module) do
     Pote.put_theme_resolver(
-      Pote.Theme.resolver(config_app: host_module.config_app(), storage_dir: fn -> host_module.storage_dir() end)
+      Pote.Theme.resolver(
+        config_app: host_module.config_app(),
+        storage_dir: fn -> host_module.storage_dir() end
+      )
     )
 
     :ok
