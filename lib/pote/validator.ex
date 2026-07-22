@@ -26,6 +26,8 @@ defmodule Pote.Validator do
 
   @type validation_result :: :ok | {:error, atom()} | {:error, atom(), String.t()}
 
+  alias Pote.Validator.Parser
+
   @doc """
   Validates a color input string with format prefix.
 
@@ -162,9 +164,9 @@ defmodule Pote.Validator do
     else
       [h_str, s_str, l_str] = parts
 
-      with {:ok, _h} <- parse_hue(h_str),
-           {:ok, _s} <- parse_percentage(s_str),
-           {:ok, _l} <- parse_percentage(l_str) do
+      with {:ok, _h} <- Parser.parse_hue(h_str),
+           {:ok, _s} <- Parser.parse_percentage(s_str),
+           {:ok, _l} <- Parser.parse_percentage(l_str) do
         :ok
       else
         {:error, reason} -> {:error, reason}
@@ -180,9 +182,9 @@ defmodule Pote.Validator do
     else
       [h_str, s_str, v_str] = parts
 
-      with {:ok, _h} <- parse_hue(h_str),
-           {:ok, _s} <- parse_percentage(s_str),
-           {:ok, _v} <- parse_percentage(v_str) do
+      with {:ok, _h} <- Parser.parse_hue(h_str),
+           {:ok, _s} <- Parser.parse_percentage(s_str),
+           {:ok, _v} <- Parser.parse_percentage(v_str) do
         :ok
       else
         {:error, reason} -> {:error, reason}
@@ -208,9 +210,9 @@ defmodule Pote.Validator do
     else
       [h, w, b] = Enum.map(parts, &String.trim/1)
 
-      with {:ok, _} <- parse_hue(h),
-           {:ok, _} <- parse_normalized(w),
-           {:ok, _} <- parse_normalized(b) do
+      with {:ok, _} <- Parser.parse_hue(h),
+           {:ok, _} <- Parser.parse_normalized(w),
+           {:ok, _} <- Parser.parse_normalized(b) do
         :ok
       else
         {:error, reason} -> {:error, reason}
@@ -233,66 +235,9 @@ defmodule Pote.Validator do
   end
 
   defp validate_cmyk_part(part) do
-    case parse_percentage(String.trim(part)) do
+    case Parser.parse_percentage(String.trim(part)) do
       {:ok, _} -> {:cont, :ok}
       {:error, reason} -> {:halt, {:error, reason}}
-    end
-  end
-
-  # ─── Value parsers ─────────────────────────────────────────────────────────
-
-  # Hue: degrees 0-360, up to 2 decimal places
-  defp parse_hue(str) do
-    str = String.trim(str)
-
-    str = String.replace(str, "°", "")
-
-    case Float.parse(str) do
-      {val, ""} ->
-        if val >= 0 and val <= 360 and valid_decimals?(str, 2) do
-          {:ok, val}
-        else
-          {:error, :hue_out_of_range}
-        end
-
-      _ ->
-        {:error, :invalid_hue}
-    end
-  end
-
-  # Normalized value: 0.0-1.0, up to 2 decimal places
-  defp parse_normalized(str) do
-    str = String.trim(str)
-
-    case Float.parse(str) do
-      {val, ""} ->
-        if val >= 0 and val <= 1.0 and valid_decimals?(str, 2) do
-          {:ok, val}
-        else
-          {:error, :ratio_out_of_range}
-        end
-
-      _ ->
-        {:error, :invalid_ratio}
-    end
-  end
-
-  # Percentage: 0-100, up to 2 decimal places
-  defp parse_percentage(str) do
-    str = String.trim(str)
-
-    str = String.replace(str, "%", "")
-
-    case Float.parse(str) do
-      {val, ""} ->
-        if val >= 0 and val <= 100.0 and valid_decimals?(str, 2) do
-          {:ok, val}
-        else
-          {:error, :percentage_out_of_range}
-        end
-
-      _ ->
-        {:error, :invalid_percentage}
     end
   end
 
@@ -302,15 +247,6 @@ defmodule Pote.Validator do
     case Integer.parse(str) do
       {val, ""} when val in 0..255 -> :ok
       _ -> {:error, :xterm_out_of_range}
-    end
-  end
-
-  defp valid_decimals?(str, max_decimals) do
-    if String.contains?(str, ".") do
-      [_, dec] = String.split(str, ".")
-      String.length(dec) <= max_decimals
-    else
-      true
     end
   end
 
