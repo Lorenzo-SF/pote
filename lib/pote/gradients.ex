@@ -201,7 +201,6 @@ defmodule Pote.Gradients do
     Enum.map(colors, &Converters.rgb_to_hsl/1)
   end
 
-  @spec interpolate(rgb(), rgb(), float()) :: rgb()
   defp interpolate({r1, g1, b1}, {r2, g2, b2}, t) do
     r = round(r1 + (r2 - r1) * t)
     g = round(g1 + (g2 - g1) * t)
