@@ -1,8 +1,9 @@
 # Pote v2.2.0 — Execution Plan
 
-> **Última actualización**: 2026-07-21
+> **Última actualización**: 2026-07-22
 > **Auditoría original**: `AUDIT.md` (2026-07-19)
 > **Auditoría complementaria**: revisión tras batch de calidad (2026-07-21)
+> **Auditoría complementaria v2**: revisión + agrupación por impacto (2026-07-22)
 > **Estado**: 5/5 comandos pasan (format, compile, credo, test, dialyzer). Pendientes refactors estructurales.
 
 ---
@@ -33,6 +34,16 @@ CHANGELOG `[Unreleased]` actualizado con bullets del lote. Git history normaliza
 | **Total tareas** | **23 + 3** | **9** | **17** |
 
 **Esfuerzo restante estimado**: ~25h (incluye refactors gordos).
+
+### Vista por impacto (ver §8 para detalle)
+
+| Impacto | # tareas | Descripción |
+|---------|----------|-------------|
+| 🟢 LOCAL | 17 | Solo afecta a pote internamente |
+| 🟡 MEDIO | 2 | Afecta a 1-2 consumers (alaja, candil, botica) |
+| 🔴 CRÍTICO | 0 | Pote es foundation layer, API estable |
+
+**Conclusión**: pote es la base del ecosistema, no rompe contratos públicos. Solo POT-09 (error shapes) y POT-21 (Orchestrator split) requieren smoke tests en consumidores.
 
 ---
 
@@ -448,17 +459,42 @@ CHANGELOG `[Unreleased]` actualizado con bullets del lote. Git history normaliza
 - **Verificación**: `mix test --cover` + `mix credo --strict` + `mix dialyzer`
 - **Riesgos**: Bajo. Solo split interno.
 
+### POT-24: Fix `Gradients.multicolor/2` segment count (P1-07)
+- **Hallazgo** (`AUDIT.md` §7.2): `lib/pote/gradients.ex:75` — `steps_per_segment = max(1, div(steps - 1, segment_count))`. Integer division trunca, así que el total de stops puede ser **menor** que `steps`. Ejemplo: `multicolor(3 colors, 4 steps)` produce solo 2 stops en lugar de 4.
+- **Severidad**: 🟠 P1 (correctness bug)
+- **Ficheros**: `lib/pote/gradients.ex`
+- **Esfuerzo**: 30 min
+- **Pasos**:
+  1. Reemplazar `steps_per_segment = max(1, div(steps - 1, segment_count))` con distribución basada en float que garantice exactamente `steps` output
+  2. Opciones:
+     - (a) Calcular `steps_per_segment = (steps - 1) / segment_count` (float) y aplicar `floor` + acumular residuo
+     - (b) Construir lista con `Enum.flat_map` y `Stream.repeatedly` para distribuir stops
+  3. Añadir property test: para cualquier `(colors, steps)`, output tiene exactamente `steps` elementos
+- **Verificación**: `mix test --cover` + property test con seeds múltiples
+- **Riesgos**: Cambio en comportamiento de `multicolor` puede afectar consumidores que asumen segment count. Verificar `Pote.Gradients.apply_to_text/4` y `vertical_fill/5` (los consumidores internos).
+
 ---
 
 ## 4. Dependencias externas
 
-| Tarea | Dependencia | Estado |
-|-------|-------------|--------|
-| POT-09 | Si cambia `Pote.Format` behaviour: verificar alaja (consume) | Pendiente de decisión diseño |
-| POT-21 | Refactor Orchestrator: verificar alaja, candil, botica (consumers) | Después de cada fase |
+| Tarea | Dependencia | Impacto |
+|-------|-------------|---------|
+| POT-09 | Si cambia `Pote.Format` behaviour: verificar alaja (consume) | 🟡 MEDIO |
+| POT-21 | Refactor Orchestrator: verificar alaja, candil, botica (consumers) | 🟡 MEDIO |
+| POT-24 | Verificar `apply_to_text/4` y `vertical_fill/5` (consumers internos) | 🟢 LOCAL |
 | Todas | `mix deps.get` + `mix deps.compile` | Funciona |
 
 Pote usa **Jason** como única dep runtime. No depende de otros proyectos lorenzo-sf en runtime.
+
+**Consumers de pote** (ordenados por blast radius):
+- **Alaja**: usa `Pote.Theme` (via `use Pote.Theme`), `Pote.Converters`, `Pote.Orchestrator` para ANSI rendering, cell colors, gradients, syntax highlighting
+- **Candil**: usa `Pote` para parsing de colores
+- **Botica**: usa `Pote` para theme colors en su output
+- **Cualquier app** que use `use Pote.Theme`
+
+Pote es **foundation layer**: cambiar API pública es breaking change, pero los refactors estructurales propuestos (POT-21, POT-23) son internamente compatibles.
+
+Ver **§8** para la matriz completa de impacto.
 
 ---
 
@@ -467,7 +503,8 @@ Pote usa **Jason** como única dep runtime. No depende de otros proyectos lorenz
 1. **POT-09 vs POT-validator-fix**: el fix de 3-tuplas (commit `77b6030`) y POT-09 (volver a 1-tupla) están en conflicto. Decisión de diseño necesaria.
 2. **POT-21 Orchestrator refactor**: el más arriesgado. Plan: branch dedicada, commits atómicos por fase, tests de consumidores después de cada fase.
 3. **POT-23 Validator split**: 7 nuevos módulos. Si se hace incremental, mantener backwards compatibility con `Validator.validate/1`.
-4. **Property tests no deterministas**: POT-05 y POT-13 usan StreamData. Falsos fallos por precisión floating-point. Usar tolerancias.
+4. **POT-24 multicolor segment bug**: fix de correctness puede cambiar comportamiento observable. Verificar consumidores internos (`apply_to_text`, `vertical_fill`).
+5. **Property tests no deterministas**: POT-05, POT-13, POT-24 usan StreamData. Falsos fallos por precisión floating-point. Usar tolerancias.
 
 ---
 
@@ -503,6 +540,7 @@ Bajo `[Unreleased]` añadir cuando se complete cada tarea:
 - `Pote.Validator` split into per-format modules (POT-23)
 
 ### Fixed
+- `Gradients.multicolor/2` now produces exactly `steps` stops (was truncating) (POT-24)
 - Various POT-XX tasks documented above
 
 ### Added
@@ -510,3 +548,83 @@ Bajo `[Unreleased]` añadir cuando se complete cada tarea:
 - Tests for `Pote.Format.*` modules (POT-22)
 
 NO bumpear versión en `[Unreleased]`.
+
+---
+
+## 8. Agrupación por impacto en el ecosistema (2026-07-22)
+
+> **Pregunta**: si hago esta tarea, ¿tengo que tocar otros proyectos o se hace y ya?
+
+Cada tarea se clasifica según su **radio de explosión** en el ecosistema:
+
+- 🟢 **LOCAL**: solo afecta a pote internamente. Se hace, se commitea, no se toca nada más.
+- 🟡 **MEDIO**: afecta a 1-2 consumidores. Se hace en pote + smoke test en esos 1-2 proyectos.
+- 🔴 **CRÍTICO**: afecta a ≥3 consumidores o a la API pública del ecosistema. Requiere branch dedicada, smoke tests en TODOS los consumidores, y rollback plan.
+
+### 🟢 LOCAL — "se hace y ya" (17 tareas)
+
+| ID | Tarea |
+|----|-------|
+| POT-01 | Eliminar dead `catch` clause en `resolve_default_color/1` |
+| POT-02 | Eliminar dead `catch` clause en `safe_decode/1` |
+| POT-03 | Arreglar `ensure_registered/0` para no re-registrar siempre |
+| POT-04 | Unificar rounding COMPLETO (interno) |
+| POT-05 | Property tests roundtrips adicionales |
+| POT-07 | `@spec` y `@doc` en `Pote.Converters` facade |
+| POT-08 | Eliminar `@spec` de funciones privadas |
+| POT-10 | Reducir `rescue _ -> :error` en `sanitize_list/2` |
+| POT-11 | Corregir valores negativos en CMYK |
+| POT-12 | Guard contra división near-zero en HWB |
+| POT-13 | Property tests CMYK/HWB/Advanced |
+| POT-15 | `@named_colors` configurable en runtime |
+| POT-16 | Verificar fórmula gray de XTerm256 |
+| POT-17 | Validar `storage_dir` nil en `save_theme` |
+| POT-18 | Traducir docs a inglés |
+| POT-22 | Tests para módulos `Pote.Format.*` |
+| POT-23 | Split `validator.ex` (390 LoC) |
+| POT-24 | Fix `Gradients.multicolor/2` segment count |
+
+**Workflow**: branch en `pote` → tests → commit → push. No tocar otros proyectos.
+
+---
+
+### 🟡 MEDIO — "verificar 1-2 consumidores" (2 tareas)
+
+Estas tareas cambian la **API pública** o la **estructura interna** de módulos usados por 1-2 proyectos. Aunque el refactor es backwards-compatible, hay que smoke-testear los consumidores.
+
+| ID | Tarea | Consumidores | Smoke test requerido |
+|----|-------|--------------|----------------------|
+| POT-09 | Estandarizar error shapes (breaking change en `{:error, _}`) | alaja (via `Pote.Format`) | `cd ../alaja && mix test` |
+| POT-21 | Refactor `Pote.Orchestrator` (624 LoC god-module) | alaja, candil, botica | `cd ../alaja && mix test && cd ../candil && mix test && cd ../botica && mix test` |
+
+**Workflow**: branch en `pote` → tests propios → smoke test en consumidores → si pasa, merge.
+
+---
+
+### 🔴 CRÍTICO (0 tareas)
+
+**No hay tareas críticas en pote.** Como foundation layer, pote tiene una API estable y los refactors estructurales propuestos (POT-21, POT-23) son internamente compatibles. Si en una futura auditoría aparece algo con blast radius ≥3, se reclasificará aquí.
+
+---
+
+### 📊 Matriz resumen
+
+| Impacto | # tareas | Esfuerzo | Branch dedicada | Smoke tests externos |
+|---------|----------|----------|-----------------|----------------------|
+| 🟢 LOCAL | 17 | ~9h | No | 0 proyectos |
+| 🟡 MEDIO | 2 | ~12h | No (en pote) | 1-3 proyectos |
+| 🔴 CRÍTICO | 0 | — | — | — |
+| **Total** | **19** | **~21h** | — | — |
+
+### 🎯 Orden de ejecución sugerido
+
+1. **Quick wins LOCAL** (30 min): POT-01, POT-02 (dead catches), POT-18 (translate docs)
+2. **Bug fixes LOCAL** (1h): POT-03 (ensure_registered), POT-11 (CMYK negatives), POT-12 (HWB guard), POT-24 (multicolor segment)
+3. **Spec cleanup LOCAL** (1h): POT-07, POT-08 (Converters facade specs)
+4. **Tests LOCAL** (3-4h): POT-05, POT-13 (property tests), POT-22 (Format tests)
+5. **Rounding policy LOCAL** (1.5h): POT-04
+6. **Polish LOCAL** (1h): POT-10, POT-15, POT-16, POT-17
+7. **MEDIO con smoke tests** (12h, varios sprints): POT-09, POT-21
+8. **Estructural gordo** (3-4h): POT-23 (Validator split)
+
+**Criterio de promoción a release propio**: las tareas MEDIO se pueden mergear como parte del ciclo normal de pote (2.X.Y). Si POT-09 rompe API (cambio de error shapes), entonces sí es minor bump (2.X.0).
