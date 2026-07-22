@@ -26,8 +26,8 @@ defmodule Pote.Validator do
 
   @type validation_result :: :ok | {:error, atom()} | {:error, atom(), String.t()}
 
-  alias Pote.Validator.Parser
   alias Pote.Validator.Bracket
+  alias Pote.Validator.Parser
 
   @doc """
   Validates a color input string with format prefix.
