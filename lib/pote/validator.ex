@@ -27,6 +27,7 @@ defmodule Pote.Validator do
   @type validation_result :: :ok | {:error, atom()} | {:error, atom(), String.t()}
 
   alias Pote.Validator.Parser
+  alias Pote.Validator.Bracket
 
   @doc """
   Validates a color input string with format prefix.
@@ -58,32 +59,6 @@ defmodule Pote.Validator do
 
   # ─── Format-specific validation ────────────────────────────────────────────
 
-  defp check_bracket_style(code, format) do
-    if String.contains?(code, "{") or String.contains?(code, "}") do
-      case format do
-        "rgb" ->
-          {:error, :rgb_uses_curly_braces, "Use rgb:R,G,B (parentheses), not rgb:{R,G,B}"}
-
-        "argb" ->
-          {:error, :argb_uses_curly_braces, "Use argb:A,R,G,B (parentheses), not argb:{A,R,G,B}"}
-
-        "hsl" ->
-          {:error, :hsl_uses_curly_braces, "Use hsl:H,S,L (parentheses), not hsl:{H,S,L}"}
-
-        "hsv" ->
-          {:error, :hsv_uses_curly_braces, "Use hsv:H,S,V (parentheses), not hsv:{H,S,V}"}
-
-        "cmyk" ->
-          {:error, :cmyk_uses_curly_braces, "Use cmyk:C,M,Y,K (parentheses), not cmyk:{C,M,Y,K}"}
-
-        _ ->
-          nil
-      end
-    else
-      nil
-    end
-  end
-
   defp validate_format("hex", code) do
     code = String.replace(code, "#", "")
 
@@ -95,27 +70,27 @@ defmodule Pote.Validator do
   end
 
   defp validate_format("rgb", code) do
-    if error = check_bracket_style(code, "rgb"), do: error, else: do_validate_rgb(code)
+    if error = Bracket.check_bracket_style(code, "rgb"), do: error, else: do_validate_rgb(code)
   end
 
   defp validate_format("argb", code) do
-    if error = check_bracket_style(code, "argb"), do: error, else: do_validate_argb(code)
+    if error = Bracket.check_bracket_style(code, "argb"), do: error, else: do_validate_argb(code)
   end
 
   defp validate_format("hsl", code) do
-    if error = check_bracket_style(code, "hsl"), do: error, else: do_validate_hsl(code)
+    if error = Bracket.check_bracket_style(code, "hsl"), do: error, else: do_validate_hsl(code)
   end
 
   defp validate_format("hsv", code) do
-    if error = check_bracket_style(code, "hsv"), do: error, else: do_validate_hsv(code)
+    if error = Bracket.check_bracket_style(code, "hsv"), do: error, else: do_validate_hsv(code)
   end
 
   defp validate_format("cmyk", code) do
-    if error = check_bracket_style(code, "cmyk"), do: error, else: do_validate_cmyk(code)
+    if error = Bracket.check_bracket_style(code, "cmyk"), do: error, else: do_validate_cmyk(code)
   end
 
   defp validate_format("hwb", code) do
-    if error = check_bracket_style(code, "hwb"), do: error, else: do_validate_hwb(code)
+    if error = Bracket.check_bracket_style(code, "hwb"), do: error, else: do_validate_hwb(code)
   end
 
   defp validate_format("xterm", code) do
