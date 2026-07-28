@@ -17,15 +17,15 @@ defmodule Pote.Format.RGBTest do
     end
 
     test "returns error for invalid boundaries" do
-      assert RGB.parse({256, 0, 0}) == :error
-      assert RGB.parse([-1, 0, 0]) == :error
-      assert RGB.parse("300, 0, 0") == :error
+      assert {:error, _} = RGB.parse({256, 0, 0})
+      assert {:error, _} = RGB.parse([-1, 0, 0])
+      assert {:error, _} = RGB.parse("300, 0, 0")
     end
 
     test "returns error for malformed strings and other types" do
-      assert RGB.parse("255,128") == :error
-      assert RGB.parse("a,b,c") == :error
-      assert RGB.parse(%{r: 255}) == :error
+      assert {:error, _} = RGB.parse("255,128")
+      assert {:error, _} = RGB.parse("a,b,c")
+      assert {:error, _} = RGB.parse(%{r: 255})
     end
   end
 

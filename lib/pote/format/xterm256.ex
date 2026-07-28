@@ -20,12 +20,12 @@ defmodule Pote.Format.XTerm256 do
 
     case Integer.parse(sanitized) do
       {n, ""} when n >= 0 and n <= 255 -> {:ok, n}
-      _ -> :error
+      _ -> {:error, "invalid xterm256 value"}
     end
   end
 
   @impl true
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid xterm256 format"}
 
   @impl true
   def valid?(n) when is_integer(n) and n >= 0 and n <= 255, do: true

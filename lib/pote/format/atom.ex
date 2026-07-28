@@ -19,19 +19,19 @@ defmodule Pote.Format.Atom do
     if Map.has_key?(Pote.default_colors(), color) do
       {:ok, color}
     else
-      :error
+      {:error, "unknown atom color name"}
     end
   end
 
   @impl true
   def parse(color) when is_binary(color), do: parse_binary_color(color)
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid atom color format"}
 
   defp parse_binary_color(color) do
     atom_color = String.to_existing_atom(color)
     parse(atom_color)
   rescue
-    ArgumentError -> :error
+    ArgumentError -> {:error, "unknown atom color name"}
   end
 
   @impl true

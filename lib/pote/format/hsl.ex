@@ -32,16 +32,16 @@ defmodule Pote.Format.HSL do
              true <- h >= 0 and h <= 360 and s >= 0 and s <= 100 and l >= 0 and l <= 100 do
           {:ok, {h, s, l}}
         else
-          _ -> :error
+          _ -> {:error, "invalid HSL values"}
         end
 
       _ ->
-        :error
+        {:error, "HSL requires exactly 3 comma-separated values"}
     end
   end
 
   @impl true
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid HSL format"}
 
   @impl true
   def valid?({h, s, l}) when h >= 0 and h <= 360 and s >= 0 and s <= 100 and l >= 0 and l <= 100,

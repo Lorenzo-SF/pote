@@ -32,16 +32,16 @@ defmodule Pote.Format.HSV do
              true <- h >= 0 and h <= 360 and s >= 0 and s <= 100 and v >= 0 and v <= 100 do
           {:ok, {h, s, v}}
         else
-          _ -> :error
+          _ -> {:error, "invalid HSV values"}
         end
 
       _ ->
-        :error
+        {:error, "HSV requires exactly 3 comma-separated values"}
     end
   end
 
   @impl true
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid HSV format"}
 
   @impl true
   def valid?({h, s, v}) when h >= 0 and h <= 360 and s >= 0 and s <= 100 and v >= 0 and v <= 100,

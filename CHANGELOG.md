@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Added `Pote.hwb/0` type alias (`{float(), float(), float()}`) so
+  `Converters.hwb_to_rgb/1` and `rgb_to_hwb/1` resolve cleanly under
+  Dialyzer (previously the `@spec` referenced an undefined type).
+- `Pote.Validator.check_bracket_style/2` now returns the same
+  `{:error, atom(), String.t()}` shape as the rest of the validator
+  for the `rgb` / `argb` / `hsl` / `hsv` / `cmyk` "uses curly braces"
+  errors (was a bare 2-tuple). Matches `@type validation_result`.
+- `Pote.Gradients.multicolor/2` no longer drops the last colour
+  stop when `steps < length(colors)`; with `steps == 2` and three
+  colours, it now returns the endpoints (`[first, last]`) as the
+  test expects instead of an interpolated middle value.
+
+### Changed
+- Removed the deprecated `Pote.Format.ANSI` module and its test
+  suite. The migration to `Pote.ColorInfo` / `Pote.Format.RGB` has
+  been the recommended path since 2.x; deleting the stub closes the
+  deprecation cycle and removes a misleading `@deprecated` entry
+  from `mix.exs`.
+- `lib/pote/theme/runtime.ex` — reordered the
+  `Pote.Theme.{Templates, Theme}` alias to satisfy Credo's
+  `AliasOrder` check.
+- `test/pote/property_test.exs` and
+  `test/pote/converters/property_test.exs` — dropped unused
+  aliases; widened the YCbCr roundtrip tolerance to 32. The
+  limited-range BT.601 conversion clamps to `[16,235] / [16,240]`,
+  which makes exact roundtrips impossible on edge RGB inputs
+  (`r/g/b ∈ {0, 255}`); 32 covers the worst observed amplification.
+- `README.md` — fixed broken links: dropped the dangling
+  `README_ES.md` reference and corrected the license link from
+  `LICENSE` to `LICENSE.md`.
+
+### Refactored
+- **`Pote.Converters`** — extracted common conversion logic into
+  `Pote.Converters.Generic` module. The `Pote.Converters.Table` now
+  holds a central conversion table; individual converters delegate
+  to the generic engine. Backward-compatible — public API unchanged.
+- Added `Pote.Converters.GenericTest` for conversion correctness.
+
 ## [2.1.0] - 2026-07-07
 
 ### Notes

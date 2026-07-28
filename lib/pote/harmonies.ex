@@ -207,14 +207,12 @@ defmodule Pote.Harmonies do
     mix({r, g, b}, {0, 0, 0}, amount)
   end
 
-  @spec rotate_hue(rgb(), number()) :: rgb()
   defp rotate_hue(rgb, degrees) do
     {h, s, l} = Converters.rgb_to_hsl(rgb)
     new_h = :math.fmod(h + degrees + 360, 360)
     Converters.hsl_to_rgb({new_h, s, l})
   end
 
-  @spec mix(rgb(), rgb(), float()) :: rgb()
   defp mix({r1, g1, b1}, {r2, g2, b2}, amount) do
     r = round(r1 + (r2 - r1) * amount)
     g = round(g1 + (g2 - g1) * amount)

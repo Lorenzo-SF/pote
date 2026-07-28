@@ -17,9 +17,9 @@ defmodule Pote.Format.HexTest do
     end
 
     test "returns error for invalid strings" do
-      assert Hex.parse("#ZZYYXX") == :error
-      assert Hex.parse("invalid") == :error
-      assert Hex.parse(123) == :error
+      assert {:error, _} = Hex.parse("#ZZYYXX")
+      assert {:error, _} = Hex.parse("invalid")
+      assert {:error, _} = Hex.parse(123)
     end
   end
 

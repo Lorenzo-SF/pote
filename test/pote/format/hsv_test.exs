@@ -17,13 +17,13 @@ defmodule Pote.Format.HSVTest do
     end
 
     test "returns error for out of bounds" do
-      assert HSV.parse({400.0, 100.0, 100.0}) == :error
-      assert HSV.parse({180.0, 101.0, 100.0}) == :error
+      assert {:error, _} = HSV.parse({400.0, 100.0, 100.0})
+      assert {:error, _} = HSV.parse({180.0, 101.0, 100.0})
     end
 
     test "returns error for random" do
-      assert HSV.parse("1,2") == :error
-      assert HSV.parse(%{}) == :error
+      assert {:error, _} = HSV.parse("1,2")
+      assert {:error, _} = HSV.parse(%{})
     end
   end
 

@@ -72,7 +72,6 @@ defmodule Pote.MixProject do
           Pote.Format.CMYK,
           Pote.Format.ARGB,
           Pote.Format.Atom,
-          Pote.Format.ANSI,
           Pote.Format.XTerm256
         ],
         Harmonies: [Pote.Harmonies],
@@ -88,7 +87,6 @@ defmodule Pote.MixProject do
 
   defp deps do
     [
-      {:apero, "~> 3.1.0"},
       {:jason, "~> 1.4"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
