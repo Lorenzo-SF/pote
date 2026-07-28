@@ -17,13 +17,13 @@ defmodule Pote.Format.HSLTest do
     end
 
     test "returns error for out of bounds" do
-      assert HSL.parse({361.0, 100.0, 100.0}) == :error
-      assert HSL.parse({180.0, 101.0, 100.0}) == :error
+      assert {:error, _} = HSL.parse({361.0, 100.0, 100.0})
+      assert {:error, _} = HSL.parse({180.0, 101.0, 100.0})
     end
 
     test "returns error for random" do
-      assert HSL.parse("1,2") == :error
-      assert HSL.parse(%{}) == :error
+      assert {:error, _} = HSL.parse("1,2")
+      assert {:error, _} = HSL.parse(%{})
     end
   end
 

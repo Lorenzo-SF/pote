@@ -12,12 +12,12 @@ defmodule Pote.Format.AtomTest do
     end
 
     test "returns error for invalid strings avoiding atom exhaustion" do
-      assert Atom.parse("nonexistent_semantic_color_12345") == :error
-      assert Atom.parse(:not_a_real_color) == :error
+      assert {:error, _} = Atom.parse("nonexistent_semantic_color_12345")
+      assert {:error, _} = Atom.parse(:not_a_real_color)
     end
 
     test "returns error for random types" do
-      assert Atom.parse(123) == :error
+      assert {:error, _} = Atom.parse(123)
     end
   end
 

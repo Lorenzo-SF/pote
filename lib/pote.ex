@@ -9,6 +9,7 @@ defmodule Pote do
   @type rgb :: {non_neg_integer(), non_neg_integer(), non_neg_integer()}
   @type hsl :: {float(), float(), float()}
   @type hsv :: {float(), float(), float()}
+  @type hwb :: {float(), float(), float()}
   @type cmyk :: {float(), float(), float(), float()}
   @type hex :: String.t()
   @type xterm256 :: 0..255
@@ -183,8 +184,6 @@ defmodule Pote do
         String.to_existing_atom(key)
       rescue
         ArgumentError -> nil
-      catch
-        :error, _ -> nil
       end
 
     case atom_key && Map.get(@default_colors, atom_key) do

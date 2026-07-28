@@ -24,12 +24,12 @@ defmodule Pote.Format.Hex do
   def parse(hex) when is_binary(hex) do
     case RGB.from_hex(hex) do
       {:ok, _rgb} -> {:ok, normalize_hex(hex)}
-      _ -> :error
+      _ -> {:error, "invalid hex color"}
     end
   end
 
   @impl true
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid hex format"}
 
   @impl true
   def valid?(<<"+", _::binary>>), do: false

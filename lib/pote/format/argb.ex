@@ -30,16 +30,16 @@ defmodule Pote.Format.ARGB do
              true <- a in 0..255 and r in 0..255 and g in 0..255 and b in 0..255 do
           {:ok, {a, r, g, b}}
         else
-          _ -> :error
+          _ -> {:error, "invalid ARGB values"}
         end
 
       _ ->
-        :error
+        {:error, "ARGB requires exactly 4 comma-separated values"}
     end
   end
 
   @impl true
-  def parse(_), do: :error
+  def parse(_), do: {:error, "invalid ARGB format"}
 
   @impl true
   def valid?({a, r, g, b}) when a in 0..255 and r in 0..255 and g in 0..255 and b in 0..255,

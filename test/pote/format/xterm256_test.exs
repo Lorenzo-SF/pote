@@ -12,14 +12,14 @@ defmodule Pote.Format.XTerm256Test do
     end
 
     test "returns error for boundaries" do
-      assert XTerm256.parse(256) == :error
-      assert XTerm256.parse(-1) == :error
-      assert XTerm256.parse("300") == :error
-      assert XTerm256.parse("invalid") == :error
+      assert {:error, _} = XTerm256.parse(256)
+      assert {:error, _} = XTerm256.parse(-1)
+      assert {:error, _} = XTerm256.parse("300")
+      assert {:error, _} = XTerm256.parse("invalid")
     end
 
     test "returns error for random types" do
-      assert XTerm256.parse(%{}) == :error
+      assert {:error, _} = XTerm256.parse(%{})
     end
   end
 

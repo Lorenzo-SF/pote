@@ -31,6 +31,11 @@ defmodule Pote.ThemeTest do
       assert data["colors"]["primary"] == [1, 2, 3]
       assert data["colors"]["bg"] == [10, 20, 30]
     end
+
+    test "save_theme with nil storage_dir returns error" do
+      theme = %Pote.Theme.Theme{name: "nil_test", colors: %{"k" => {1, 2, 3}}}
+      assert {:error, _} = Theme.save_theme(theme, nil)
+    end
   end
 
   describe "list_themes/1" do

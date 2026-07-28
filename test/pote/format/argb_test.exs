@@ -12,13 +12,13 @@ defmodule Pote.Format.ARGBTest do
     end
 
     test "returns error for boundaries" do
-      assert ARGB.parse({256, 0, 0, 0}) == :error
-      assert ARGB.parse({255, -1, 0, 0}) == :error
+      assert {:error, _} = ARGB.parse({256, 0, 0, 0})
+      assert {:error, _} = ARGB.parse({255, -1, 0, 0})
     end
 
     test "returns error for random" do
-      assert ARGB.parse("255,128,64") == :error
-      assert ARGB.parse(123) == :error
+      assert {:error, _} = ARGB.parse("255,128,64")
+      assert {:error, _} = ARGB.parse(123)
     end
   end
 

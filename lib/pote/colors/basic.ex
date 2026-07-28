@@ -7,6 +7,7 @@ defmodule Pote.Colors.Basic do
   """
 
   @basic_colors %{
+    # Standard 16 ANSI colours
     black: {0, 0, 0},
     red: {255, 0, 0},
     green: {0, 255, 0},
@@ -22,7 +23,24 @@ defmodule Pote.Colors.Basic do
     bright_blue: {128, 128, 255},
     bright_magenta: {255, 128, 255},
     bright_cyan: {128, 255, 255},
-    bright_white: {255, 255, 255}
+    bright_white: {255, 255, 255},
+    # Common aliases
+    gray: {128, 128, 128},
+    grey: {128, 128, 128},
+    # Extended colours (common web/ui names)
+    orange: {255, 165, 0},
+    purple: {128, 0, 128},
+    pink: {255, 192, 203},
+    violet: {238, 130, 238},
+    indigo: {75, 0, 130},
+    teal: {0, 128, 128},
+    lime: {0, 255, 0},
+    navy: {0, 0, 128},
+    maroon: {128, 0, 0},
+    olive: {128, 128, 0},
+    aqua: {0, 255, 255},
+    fuchsia: {255, 0, 255},
+    silver: {192, 192, 192}
   }
 
   @ansi_codes %{
@@ -49,6 +67,12 @@ defmodule Pote.Colors.Basic do
   """
   @spec basic_colors() :: %{atom() => {0..255, 0..255, 0..255}}
   def basic_colors, do: @basic_colors
+
+  @doc """
+  Returns all named colors (basic + extended) for use in parsing.
+  """
+  @spec named_colors() :: %{atom() => {0..255, 0..255, 0..255}}
+  def named_colors, do: @basic_colors
 
   @doc """
   Returns the ANSI code for a basic color name.

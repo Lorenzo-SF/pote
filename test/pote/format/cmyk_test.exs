@@ -17,13 +17,13 @@ defmodule Pote.Format.CMYKTest do
     end
 
     test "returns error for out of bounds" do
-      assert CMYK.parse({101.0, 0.0, 0.0, 0.0}) == :error
-      assert CMYK.parse({0.0, -0.1, 0.0, 0.0}) == :error
+      assert {:error, _} = CMYK.parse({101.0, 0.0, 0.0, 0.0})
+      assert {:error, _} = CMYK.parse({0.0, -0.1, 0.0, 0.0})
     end
 
     test "returns error for invalid parse" do
-      assert CMYK.parse("1,2,3") == :error
-      assert CMYK.parse(%{}) == :error
+      assert {:error, _} = CMYK.parse("1,2,3")
+      assert {:error, _} = CMYK.parse(%{})
     end
   end
 
