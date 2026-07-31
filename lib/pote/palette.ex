@@ -143,7 +143,7 @@ defmodule Pote.Palette do
   end
 
   defp random_color do
-    hue = :rand.uniform(360) - 1
+    hue = (:rand.uniform(360) - 1) * 1.0
     sat = 55.0 + (:rand.uniform(45) - 1)
     light = 40.0 + (:rand.uniform(30) - 1)
     Converters.hsl_to_rgb({hue, sat, light})

@@ -137,7 +137,7 @@ defmodule Pote.Style do
       iex> Pote.Style.red() |> Pote.Style.to_ansi()
       "\e[38;2;255;0;0m"
   """
-  @spec to_ansi(t()) :: IO.iodata()
+  @spec to_ansi(t()) :: iodata()
   def to_ansi(%__MODULE__{} = style) do
     [
       Enum.map(style.effects, &effect_ansi/1),
@@ -154,7 +154,7 @@ defmodule Pote.Style do
       iex> Pote.Style.red() |> Pote.Style.render("hi") |> IO.iodata_to_binary()
       "\e[38;2;255;0;0mhi\e[0m"
   """
-  @spec render(t(), binary()) :: IO.iodata()
+  @spec render(t(), binary()) :: iodata()
   def render(%__MODULE__{} = style, text) do
     [to_ansi(style), text, IO.ANSI.reset()]
   end
