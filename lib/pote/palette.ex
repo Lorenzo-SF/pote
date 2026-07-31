@@ -124,7 +124,7 @@ defmodule Pote.Palette do
     {h, s, l} = Converters.rgb_to_hsl(base)
 
     colors ++
-      Enum.map(count - length(colors)..1, fn i ->
+      Enum.map((count - length(colors))..1, fn i ->
         Converters.hsl_to_rgb({h, s, fill_lightness(l, i)})
       end)
   end
@@ -208,8 +208,8 @@ defmodule Pote.Palette do
     remap_lightness(h, s, 0.0, 100.0, target_lum, @max_remap_iters)
   end
 
-  defp remap_lightness(_h, _s, lo, _hi, _target, 0) do
-    Converters.hsl_to_rgb({_h, _s, lo})
+  defp remap_lightness(h, s, lo, _hi, _target, 0) do
+    Converters.hsl_to_rgb({h, s, lo})
   end
 
   defp remap_lightness(h, s, lo, hi, target, iters) do

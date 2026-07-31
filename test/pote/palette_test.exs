@@ -26,6 +26,7 @@ defmodule Pote.PaletteTest do
       for base <- [:harmonious, :analogous, :complementary] do
         palette = Palette.generate(7, count: 4, base: base)
         assert length(palette) == 4
+
         assert Enum.all?(palette, fn {r, g, b} ->
                  r in 0..255 and g in 0..255 and b in 0..255
                end)
@@ -78,26 +79,28 @@ defmodule Pote.PaletteTest do
   end
 
   property "every generated color is a valid RGB tuple" do
-    check all seed <- integer(0..10_000) do
+    check all(seed <- integer(0..10_000)) do
       palette = Palette.generate(seed, count: 4)
       assert Enum.all?(palette, fn {r, g, b} -> r in 0..255 and g in 0..255 and b in 0..255 end)
     end
   end
 
   property "wcag_aa: true palettes always satisfy the target (3 colors @ 4.5)" do
-    check all seed <- integer(0..500) do
+    check all(seed <- integer(0..500)) do
       palette = Palette.generate(seed, count: 3, wcag_aa: true)
       assert Palette.wcag_aa?(palette)
     end
   end
 
   property "wcag_aa? accepts palettes sorted by luminance" do
-    check all a <- integer(0..255),
-              b <- integer(0..255),
-              c <- integer(0..255),
-              d <- integer(0..255),
-              e <- integer(0..255),
-              f <- integer(0..255) do
+    check all(
+            a <- integer(0..255),
+            b <- integer(0..255),
+            c <- integer(0..255),
+            d <- integer(0..255),
+            e <- integer(0..255),
+            f <- integer(0..255)
+          ) do
       palette = [{a, b, c}, {d, e, f}]
       assert Palette.wcag_aa?(palette) == Palette.wcag_aa?(Enum.reverse(palette))
     end

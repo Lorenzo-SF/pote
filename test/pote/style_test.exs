@@ -119,7 +119,7 @@ defmodule Pote.StyleTest do
   end
 
   property "fg/bg never leak into each other" do
-    check all rgb <- tuple({integer(0..255), integer(0..255), integer(0..255)}) do
+    check all(rgb <- tuple({integer(0..255), integer(0..255), integer(0..255)})) do
       style = Style.fg(rgb) |> Style.bg(rgb)
       assert style.fg == rgb
       assert style.bg == rgb
