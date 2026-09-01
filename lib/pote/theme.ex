@@ -187,6 +187,124 @@ defmodule Pote.Theme do
   end
 
   @doc """
+  Parses a theme JSON binary (or reads one from a file path) into a
+  `Pote.Theme.Theme` struct, validating the schema.
+
+  Accepts either a JSON string/binary or a filesystem path. Validates
+  that the payload has a `name`, an optional `description`, and a
+  `colors` map where every value is an RGB triplet `[r, g, b]` of
+  integers in `0..255`.
+
+  Returns `{:ok, %Pote.Theme.Theme{}}` on success or
+  `{:error, %Pote.Error{kind: :invalid_theme, ...}}` when the JSON is
+  malformed or the schema does not match. `parse/1` is an alias with
+  the same behaviour; `parse!/1` raises instead.
+
+  ## Examples
+
+      iex> Pote.Theme.load_json(~s({"name":"x","colors":{"fg":[255,0,0]}}))
+      {:ok, %Pote.Theme.Theme{name: "x", colors: %{"fg" => {255, 0, 0}}}}
+  """
+  @spec load_json(String.t()) :: {:ok, Theme.t()} | {:error, Pote.Error.t()}
+  def load_json(input) when is_binary(input) do
+    content =
+      if String.contains?(input, "\n") or String.starts_with?(String.trim(input), "{") do
+        {:inline, input}
+      else
+        case File.read(input) do
+          {:ok, content} ->
+            {:file, content}
+
+          {:error, reason} ->
+            {:error, invalid_theme(:unreadable, "cannot read theme file", reason)}
+        end
+      end
+
+    case content do
+      {:error, _} = err ->
+        err
+
+      {:inline, json} ->
+        from_json(json)
+
+      {:file, json} ->
+        from_json(json)
+    end
+  end
+
+  @doc """
+  Same as `load_json/1`. Kept as the canonical name for callers that
+  want to think of theme files as parseable documents.
+  """
+  @spec parse(String.t()) :: {:ok, Theme.t()} | {:error, Pote.Error.t()}
+  defdelegate parse(input), to: __MODULE__, as: :load_json
+
+  @doc """
+  Same as `load_json/1` but raises `Pote.Error` on failure.
+  """
+  @spec parse!(String.t()) :: Theme.t()
+  def parse!(input) do
+    case load_json(input) do
+      {:ok, theme} -> theme
+      {:error, %Pote.Error{} = error} -> raise error
+    end
+  end
+
+  defp invalid_theme(kind, message, details),
+    do: %Pote.Error{kind: :invalid_theme, message: message, details: {kind, details}}
+
+  defp from_json(json) do
+    with {:ok, data} <- Jason.decode(json),
+         {:ok, theme} <- theme_from_map(data) do
+      {:ok, theme}
+    else
+      {:error, %Jason.DecodeError{}} ->
+        {:error, invalid_theme(:invalid_json, "invalid JSON", nil)}
+
+      {:error, reason} ->
+        {:error, invalid_theme(reason, "invalid theme schema", nil)}
+    end
+  end
+
+  defp theme_from_map(%{"name" => name} = data) when is_binary(name) do
+    with :ok <- validate_color_mode(data),
+         {:ok, colors} <- validate_colors(Map.get(data, "colors", %{})) do
+      description = if is_binary(data["description"]), do: data["description"], else: nil
+      {:ok, %Theme{name: name, description: description, colors: colors}}
+    end
+  end
+
+  defp theme_from_map(_), do: {:error, :missing_name}
+
+  # A theme cannot combine xterm256 and truecolor rendering modes.
+  # The schema only allows a single `color_mode` value.
+  defp validate_color_mode(data) do
+    case data["color_mode"] do
+      nil -> :ok
+      "both" -> {:error, {:color_mode_both_not_allowed}}
+      mode when mode in ["auto", "truecolor", "xterm256"] -> :ok
+      _ -> {:error, {:invalid_color_mode, data["color_mode"]}}
+    end
+  end
+
+  defp validate_colors(colors) when is_map(colors) do
+    Enum.reduce_while(colors, {:ok, %{}}, fn
+      {key, [r, g, b]}, {:ok, acc}
+      when is_binary(key) and is_integer(r) and is_integer(g) and is_integer(b) ->
+        if r in 0..255 and g in 0..255 and b in 0..255 do
+          {:cont, {:ok, Map.put(acc, key, {r, g, b})}}
+        else
+          {:halt, {:error, {:color_out_of_range, key}}}
+        end
+
+      {key, _}, _acc ->
+        {:halt, {:error, {:invalid_color, key}}}
+    end)
+  end
+
+  defp validate_colors(_), do: {:error, :colors_must_be_map}
+
+  @doc """
   Writes a `Pote.Theme.Theme` struct to disk under `storage_dir`.
 
   Creates `storage_dir` if it does not exist. Returns `:ok` on

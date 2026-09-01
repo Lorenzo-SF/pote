@@ -192,6 +192,72 @@ defmodule Pote.Gradients do
   end
 
   @doc """
+  Generates a linear gradient interpolating in CIELAB space.
+
+  Same API as `linear/3` (RGB endpoints, `steps` RGB results) but the
+  interpolation happens in perceptual LAB space, which avoids the
+  "muddy middle gray" that direct RGB interpolation produces between
+  saturated colors.
+
+  ## Examples
+
+      iex> linear_lab({255, 0, 0}, {0, 0, 255}, 3) |> length()
+      3
+  """
+  @spec linear_lab(rgb(), rgb(), pos_integer()) :: [rgb()]
+  def linear_lab(from, to, steps) when steps >= 2 do
+    {fl, fa, fb} = Converters.Advanced.to_lab(from)
+    {tl, ta, tb} = Converters.Advanced.to_lab(to)
+
+    Enum.map(0..(steps - 1), fn i ->
+      t = i / (steps - 1)
+      {l, a, b} = {fl + (tl - fl) * t, fa + (ta - fa) * t, fb + (tb - fb) * t}
+      Converters.Advanced.from_lab({l, a, b})
+    end)
+  end
+
+  @doc """
+  Generates a linear gradient interpolating in OKLCH space.
+
+  Same API as `linear/3`. Interpolates lightness, chroma and hue
+  (taking the shortest hue path), producing perceptually even steps —
+  the current best practice for smooth color transitions.
+
+  ## Examples
+
+      iex> linear_oklch({255, 0, 0}, {0, 0, 255}, 3) |> length()
+      3
+  """
+  @spec linear_oklch(rgb(), rgb(), pos_integer()) :: [rgb()]
+  def linear_oklch(from, to, steps) when steps >= 2 do
+    {fl, fc, fh} = Converters.Advanced.to_oklch(from)
+    {tl, tc, th} = Converters.Advanced.to_oklch(to)
+    dh = shortest_hue_delta(fh, th)
+
+    Enum.map(0..(steps - 1), fn i ->
+      t = i / (steps - 1)
+      l = fl + (tl - fl) * t
+      c = fc + (tc - fc) * t
+      h = wrap_hue(fh + dh * t)
+      Converters.Advanced.from_oklch({l, c, h})
+    end)
+  end
+
+  defp shortest_hue_delta(from, to) do
+    delta = to - from
+
+    cond do
+      delta > 180.0 -> delta - 360.0
+      delta < -180.0 -> delta + 360.0
+      true -> delta
+    end
+  end
+
+  defp wrap_hue(h) when h < 0, do: h + 360.0
+  defp wrap_hue(h) when h >= 360, do: h - 360.0
+  defp wrap_hue(h), do: h
+
+  @doc """
   Converts a list of RGB tuples to their corresponding HSL tuples.
 
   Useful for analyzing or transforming gradient stops in HSL space.

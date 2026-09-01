@@ -142,4 +142,71 @@ defmodule Pote.GradientsTest do
       assert_in_delta h2, 240.0, 1.0
     end
   end
+
+  describe "linear_lab/3" do
+    test "returns steps colors including endpoints" do
+      grad = Gradients.linear_lab(@red, @blue, 5)
+      assert length(grad) == 5
+      assert Enum.at(grad, 0) == @red
+      assert Enum.at(grad, 4) == @blue
+    end
+
+    test "perceptual middle is not muddy gray" do
+      grad = Gradients.linear_lab(@red, @blue, 5)
+      mid = Enum.at(grad, 2)
+      # Not a gray: channels must differ enough (muddy gray is r≈g≈b)
+      refute abs(elem(mid, 0) - elem(mid, 1)) < 15 and abs(elem(mid, 1) - elem(mid, 2)) < 15
+    end
+
+    test "enforces minimum 2 steps" do
+      assert_raise FunctionClauseError, fn -> Gradients.linear_lab(@red, @blue, 1) end
+    end
+  end
+
+  describe "linear_oklch/3" do
+    test "returns steps colors including endpoints" do
+      grad = Gradients.linear_oklch(@red, @blue, 5)
+      assert length(grad) == 5
+      assert Enum.at(grad, 0) == @red
+      assert Enum.at(grad, 4) == @blue
+    end
+
+    test "perceptual middle keeps chroma (no muddy gray)" do
+      grad = Gradients.linear_oklch(@red, @blue, 5)
+      mid = Enum.at(grad, 2)
+      # Known value from the Ottosson interpolation: vivid purple
+      assert mid == {186, 0, 194}
+    end
+
+    test "takes the shortest hue path (wrap-around)" do
+      # Orange (~50deg) to pink (~350deg): must go through red, not blue
+      {255, 128, 0} = orange = {255, 128, 0}
+      pink = {255, 150, 200}
+      grad = Gradients.linear_oklch(orange, pink, 3)
+      middle = Enum.at(grad, 1)
+      # Middle should be reddish (r dominant, b < r), not bluish
+      assert elem(middle, 0) > elem(middle, 2)
+    end
+
+    test "enforces minimum 2 steps" do
+      assert_raise FunctionClauseError, fn -> Gradients.linear_oklch(@red, @blue, 1) end
+    end
+
+    property "linear_oklch always returns valid RGB for random endpoints" do
+      check all(
+              r1 <- integer(0..255),
+              g1 <- integer(0..255),
+              b1 <- integer(0..255),
+              r2 <- integer(0..255),
+              g2 <- integer(0..255),
+              b2 <- integer(0..255)
+            ) do
+        grad = Gradients.linear_oklch({r1, g1, b1}, {r2, g2, b2}, 4)
+
+        assert Enum.all?(grad, fn {r, g, b} ->
+                 r in 0..255 and g in 0..255 and b in 0..255
+               end)
+      end
+    end
+  end
 end

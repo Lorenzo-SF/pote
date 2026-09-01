@@ -45,6 +45,56 @@ defmodule Pote.Converters.AdvancedTest do
     end
   end
 
+  describe "OKLab conversions" do
+    test "to_oklab converts correctly" do
+      # Red: known OKLab values (Ottosson reference)
+      {l, a, b} = Advanced.to_oklab({255, 0, 0})
+      assert_in_delta l, 0.6279, 0.01
+      assert_in_delta a, 0.2249, 0.01
+      assert_in_delta b, 0.1258, 0.01
+    end
+
+    test "to_oklab and from_oklab round-trip" do
+      for rgb <- [
+            {255, 0, 0},
+            {0, 255, 0},
+            {0, 0, 255},
+            {128, 128, 128},
+            {1, 2, 3},
+            {255, 255, 255},
+            {0, 0, 0}
+          ] do
+        assert Advanced.from_oklab(Advanced.to_oklab(rgb)) == rgb
+      end
+    end
+
+    test "gray has zero a/b channels" do
+      {_l, a, b} = Advanced.to_oklab({128, 128, 128})
+      assert_in_delta a, 0.0, 0.01
+      assert_in_delta b, 0.0, 0.01
+    end
+  end
+
+  describe "OKLCH conversions" do
+    test "to_oklch hue is in degrees 0..360" do
+      {l, c, h} = Advanced.to_oklch({255, 0, 0})
+      assert l >= 0.0 and l <= 1.0
+      assert c > 0.0
+      assert h >= 0.0 and h < 360.0
+    end
+
+    test "red hue is around 29 degrees" do
+      {_l, _c, h} = Advanced.to_oklch({255, 0, 0})
+      assert_in_delta h, 29.23, 1.0
+    end
+
+    test "to_oklch and from_oklch round-trip" do
+      for rgb <- [{255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {128, 128, 128}, {5, 120, 200}] do
+        assert Advanced.from_oklch(Advanced.to_oklch(rgb)) == rgb
+      end
+    end
+  end
+
   describe "Delta E (color distance)" do
     test "delta_e for identical colors is zero" do
       assert Advanced.delta_e({255, 0, 0}, {255, 0, 0}) == 0.0

@@ -17,6 +17,8 @@ defmodule Pote.Converters.Advanced do
   @type rgb :: Pote.rgb()
   @type xyz :: {float(), float(), float()}
   @type lab :: {float(), float(), float()}
+  @type oklab :: {float(), float(), float()}
+  @type oklch :: {float(), float(), float()}
   @type yuv :: {integer(), integer(), integer()}
   @type ycbcr :: {integer(), integer(), integer()}
 
@@ -140,6 +142,105 @@ defmodule Pote.Converters.Advanced do
       end
 
     from_xyz({x * 0.95047, y * 1.0, z * 1.08883})
+  end
+
+  # ============================================================================
+  # OKLab / OKLCH (Björn Ottosson)
+  # ============================================================================
+
+  @doc """
+  Converts RGB to OKLab (Ottosson's perceptual space).
+
+  OKLab is a perceptual color space designed for smooth, uniform
+  interpolation: midpoints stay perceptually consistent, avoiding the
+  "muddy middle" of RGB/HSL interpolation.
+  """
+  @spec to_oklab(rgb()) :: oklab()
+  def to_oklab({r, g, b}) do
+    [rn, gn, bn] =
+      [r, g, b]
+      |> Enum.map(fn v -> v / 255.0 end)
+      |> Enum.map(fn v ->
+        if v <= 0.04045 do
+          v / 12.92
+        else
+          :math.pow((v + 0.055) / 1.055, 2.4)
+        end
+      end)
+
+    l = 0.4122214708 * rn + 0.5363325363 * gn + 0.0514459929 * bn
+    m = 0.2119034982 * rn + 0.6806995451 * gn + 0.1073969566 * bn
+    s = 0.0883024619 * rn + 0.2817188376 * gn + 0.6299787005 * bn
+
+    l_ = :math.pow(l, 1.0 / 3.0)
+    m_ = :math.pow(m, 1.0 / 3.0)
+    s_ = :math.pow(s, 1.0 / 3.0)
+
+    l_ok = 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_
+    a = 1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_
+    b = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_
+
+    {l_ok, a, b}
+  end
+
+  @doc """
+  Converts OKLab to RGB (sRGB D65).
+  """
+  @spec from_oklab(oklab()) :: rgb()
+  def from_oklab({l, a, b}) do
+    l_ = l + 0.3963377774 * a + 0.2158037573 * b
+    m_ = l - 0.1055613458 * a - 0.0638541728 * b
+    s_ = l - 0.0894841775 * a - 1.2914855480 * b
+
+    l_3 = :math.pow(l_, 3)
+    m_3 = :math.pow(m_, 3)
+    s_3 = :math.pow(s_, 3)
+
+    rn = 4.0767416621 * l_3 - 3.3077115913 * m_3 + 0.2309699292 * s_3
+    gn = -1.2684380046 * l_3 + 2.6097574011 * m_3 - 0.3413193965 * s_3
+    bn = -0.0041960863 * l_3 - 0.7034186147 * m_3 + 1.7076147010 * s_3
+
+    [r, g, b] =
+      [rn, gn, bn]
+      |> Enum.map(fn v ->
+        if v <= 0.0031308 do
+          v * 12.92
+        else
+          :math.pow(v, 1.0 / 2.4) * 1.055 - 0.055
+        end
+      end)
+      |> Enum.map(fn v -> round(v * 255) end)
+      |> Enum.map(fn v -> min(max(v, 0), 255) end)
+
+    {r, g, b}
+  end
+
+  @doc """
+  Converts RGB to OKLCH (OKLab in polar form).
+
+  Returns `{l, c, h}` where `l` is perceptual lightness (0..1),
+  `c` is chroma, and `h` is hue in degrees (0..360).
+  """
+  @spec to_oklch(rgb()) :: oklch()
+  def to_oklch(rgb) do
+    {l, a, b} = to_oklab(rgb)
+
+    c = :math.sqrt(a * a + b * b)
+    h = :math.atan2(b, a) * 180.0 / :math.pi()
+    h = if h < 0, do: h + 360.0, else: h
+
+    {l, c, h}
+  end
+
+  @doc """
+  Converts OKLCH to RGB (sRGB D65).
+  """
+  @spec from_oklch(oklch()) :: rgb()
+  def from_oklch({l, c, h}) do
+    a = c * :math.cos(h * :math.pi() / 180.0)
+    b = c * :math.sin(h * :math.pi() / 180.0)
+
+    from_oklab({l, a, b})
   end
 
   # ============================================================================
