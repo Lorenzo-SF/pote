@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] — 2026-07-31
+
+### Added
+- `Pote.Style` — inline styling DSL: immutable `%Pote.Style{}` struct
+  with `fg`/`bg`/`effects`, named-color helpers generated from
+  `Pote.Colors.Basic`, color resolution via `Pote.parse!` (atoms, RGB
+  tuples, hex strings), and truecolor ANSI rendering (`to_ansi/1`,
+  `render/2`). P-1.
+- `Pote.Palette` — deterministic procedural palette generation from a
+  seed over `Pote.Harmonies` bases (`:harmonious`/`:analogous`/
+  `:complementary`) with optional WCAG AA enforcement via an optimal
+  luminance ladder (P-2). `wcag_aa?/1` checks the ladder property.
+- `Pote.Gradients.linear_lab/3` and `linear_oklch/3` — perceptual
+  interpolation (CIELAB, OKLab/OKLCH with shortest-hue-path) that
+  avoids the muddy middle gray of RGB interpolation. P-3.
+- `Pote.Converters.Advanced.to_oklab/1`, `from_oklab/1`,
+  `to_oklch/1`, `from_oklch/1` — Ottosson's perceptual color space
+  conversions. P-3.
+- `Pote.Theme.load_json/1` — parses and validates a theme JSON binary
+  or file path into a `Pote.Theme.Theme` struct. P-5.
+- `Pote.Theme.parse/1` and `parse!/1` — typed-error variants of
+  `load_json/1`. P-8.
+- `Pote.Error` — typed error struct (`kind`, `message`, `details`)
+  used by theme parsing. P-8.
+- `Pote.Accessibility` — color-blindness simulation (Machado et al.
+  matrices for protanopia/deuteranopia/tritanopia) and
+  `distinguishable?/3`. P-6.
+- `guides/gallery.md` — visual guide with runnable examples for
+  Style, Gradients, Palette, Theme and Accessibility. P-10.
+
+### Changed
+- Theme JSON schema validation now rejects `color_mode: "both"` and
+  unknown `color_mode` values (only `"auto"`, `"truecolor"`,
+  `"xterm256"` are accepted). P-9.
+- `Pote.Gradients.multicolor/2` keeps endpoint semantics when
+  `steps < length(colors)` (regression fix from 2.x cycle).
+
+### Fixed
+- `Pote.Style` uses the correct `IO.ANSI` effect functions for
+  Elixir 1.19 (`bright/0`, `faint/0`, `blink_slow/0`, `conceal/0`)
+  and emits truecolor escapes manually (3/4-arg `IO.ANSI.color*`
+  only accept 0-5 in modern Elixir).
+- `Pote.Palette.remap_lightness/6` no longer triggers an unused
+  variable warning.
+
+### Notes
+- P-4 (`Pote.Syntax`) is intentionally **not** implemented in this
+  release: `Alaja.Syntax` (sibling project, FASE 2) already provides
+  the tokenizer/highlighter; the spec allows marking it optional.
+
 ## [Unreleased]
 
 ### Fixed
