@@ -28,6 +28,16 @@ defmodule Pote.SanitizerTest do
     test "handles combined units" do
       assert Sanitizer.sanitize("360º, 50%, 50%") == "360, 50, 50"
     end
+
+    test "raises ArgumentError for non-binary input (P0-1 fix)" do
+      assert_raise ArgumentError, ~r/expected a binary/, fn ->
+        Sanitizer.sanitize(123)
+      end
+
+      assert_raise ArgumentError, ~r/expected a binary/, fn ->
+        Sanitizer.sanitize(nil)
+      end
+    end
   end
 
   describe "sanitize_list/2" do
@@ -46,6 +56,14 @@ defmodule Pote.SanitizerTest do
 
     test "returns error when not a proper list with nil separator" do
       assert {:error, _} = Sanitizer.sanitize_list("not a list", nil)
+    end
+
+    test "returns error when separator is not a binary (P0-2 fix)" do
+      assert {:error, :invalid_input} = Sanitizer.sanitize_list("a,b,c", :not_a_binary)
+    end
+
+    test "binary input with nil separator still returns invalid_input (P0-2 fix)" do
+      assert {:error, :invalid_input} = Sanitizer.sanitize_list("a,b,c", nil)
     end
   end
 end

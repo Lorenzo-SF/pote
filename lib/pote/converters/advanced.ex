@@ -303,6 +303,41 @@ defmodule Pote.Converters.Advanced do
     |> Float.round(2)
   end
 
+  @doc """
+  Returns the WCAG 2.1 conformance level for a given contrast ratio.
+
+  Levels (for normal text):
+    * `:aaa` — 7.0+ (enhanced)
+    * `:aa`  — 4.5+ (minimum)
+    * `:fail` — < 4.5
+
+  For large text (18pt+ or 14pt+ bold), the thresholds are lower:
+    * `:aaa` — 4.5+
+    * `:aa`  — 3.0+
+    * `:fail` — < 3.0
+
+  ## Examples
+
+      iex> Pote.Converters.Advanced.wcag_level(7.5)
+      :aaa
+
+      iex> Pote.Converters.Advanced.wcag_level(4.5)
+      :aa
+
+      iex> Pote.Converters.Advanced.wcag_level(2.0)
+      :fail
+  """
+  @spec wcag_level(float(), :normal | :large) :: :aaa | :aa | :fail
+  def wcag_level(ratio, size \\ :normal)
+
+  def wcag_level(ratio, :normal) when ratio >= 7.0, do: :aaa
+  def wcag_level(ratio, :normal) when ratio >= 4.5, do: :aa
+  def wcag_level(_ratio, :normal), do: :fail
+
+  def wcag_level(ratio, :large) when ratio >= 4.5, do: :aaa
+  def wcag_level(ratio, :large) when ratio >= 3.0, do: :aa
+  def wcag_level(_ratio, :large), do: :fail
+
   # ============================================================================
   # YUV (BT.601)
   # ============================================================================

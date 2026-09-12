@@ -2,6 +2,7 @@ defmodule Pote.AccessibilityTest do
   use ExUnit.Case
   use ExUnitProperties
   alias Pote.Accessibility
+  alias Pote.Converters.Advanced
 
   describe "simulate/2" do
     test "protanopia collapses red toward dark brown" do
@@ -31,7 +32,7 @@ defmodule Pote.AccessibilityTest do
           deficiency <- [:protanopia, :deuteranopia, :tritanopia] do
         simulated = Accessibility.simulate(gray, deficiency)
         # Perceptual difference stays small
-        assert Pote.Converters.Advanced.delta_e(gray, simulated) < 15.0
+        assert Advanced.delta_e(gray, simulated) < 15.0
       end
     end
 

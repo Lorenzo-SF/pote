@@ -124,7 +124,7 @@ defmodule Pote.Palette do
     {h, s, l} = Converters.rgb_to_hsl(base)
 
     colors ++
-      Enum.map((count - length(colors))..1, fn i ->
+      Enum.map((count - length(colors))..1//-1, fn i ->
         Converters.hsl_to_rgb({h, s, fill_lightness(l, i)})
       end)
   end
