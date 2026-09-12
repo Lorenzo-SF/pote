@@ -3,9 +3,6 @@ defmodule Pote.Style do
   Inline styling DSL — compose foreground, background and text effects
   into an immutable `%Pote.Style{}` struct, then render text with ANSI
   escapes.
-  """
-
-  alias Pote.Colors
 
   `Pote.Style` is the agnostic, terminal-agnostic layer: it resolves
   colors (atoms from `Pote.Colors.Basic`, RGB tuples, hex strings via
