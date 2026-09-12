@@ -23,6 +23,8 @@ defmodule Pote.Style do
       "\e[1m\e[38;2;255;0;0m\e[48;2;30;30;46mhi\e[0m"
   """
 
+  alias Pote.Colors.Basic
+
   @type effect :: :bold | :dim | :italic | :underline | :inverse | :blink | :hidden
 
   @type t :: %__MODULE__{
@@ -54,7 +56,7 @@ defmodule Pote.Style do
 
   # -- named colors -------------------------------------------------------
 
-  for {name, _rgb} <- Pote.Colors.Basic.named_colors() do
+  for {name, _rgb} <- Basic.named_colors() do
     @doc """
     Returns a style with `#{name}` as the foreground color.
 

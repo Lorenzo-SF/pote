@@ -1,6 +1,7 @@
 defmodule Pote.StyleTest do
   use ExUnit.Case
   use ExUnitProperties
+  alias Pote.Colors.Basic
   alias Pote.Style
 
   @red {255, 0, 0}
@@ -49,7 +50,7 @@ defmodule Pote.StyleTest do
 
   describe "named color helpers" do
     test "every basic color has a fg helper" do
-      for {name, rgb} <- Pote.Colors.Basic.named_colors() do
+      for {name, rgb} <- Basic.named_colors() do
         style = apply(Style, name, [])
         assert style.fg == rgb
       end

@@ -132,6 +132,33 @@ defmodule Pote.Converters.AdvancedTest do
     end
   end
 
+  describe "WCAG level grading" do
+    test "wcag_level :aaa for ratio >= 7.0" do
+      assert Advanced.wcag_level(7.0) == :aaa
+      assert Advanced.wcag_level(15.0) == :aaa
+      assert Advanced.wcag_level(21.0) == :aaa
+    end
+
+    test "wcag_level :aa for ratio >= 4.5 (normal text)" do
+      assert Advanced.wcag_level(4.5) == :aa
+      assert Advanced.wcag_level(6.99) == :aa
+    end
+
+    test "wcag_level :fail for ratio < 4.5 (normal text)" do
+      assert Advanced.wcag_level(4.49) == :fail
+      assert Advanced.wcag_level(1.0) == :fail
+    end
+
+    test "wcag_level large text uses lower thresholds" do
+      # 4.5+ is AAA for large text
+      assert Advanced.wcag_level(4.5, :large) == :aaa
+      # 3.0+ is AA for large text
+      assert Advanced.wcag_level(3.5, :large) == :aa
+      # Below 3.0 fails
+      assert Advanced.wcag_level(2.9, :large) == :fail
+    end
+  end
+
   describe "YUV (BT.601) conversions" do
     test "to_yuv converts correctly" do
       result = Advanced.to_yuv({255, 128, 0})
