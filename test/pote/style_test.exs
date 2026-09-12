@@ -1,6 +1,7 @@
 defmodule Pote.StyleTest do
   use ExUnit.Case
   use ExUnitProperties
+  alias Pote.Colors
   alias Pote.Style
 
   @red {255, 0, 0}
