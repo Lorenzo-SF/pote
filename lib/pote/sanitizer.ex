@@ -44,11 +44,4 @@ defmodule Pote.Sanitizer do
   end
 
   def sanitize_list(_input, _separator), do: {:error, :invalid_input}
-
-  @spec sanitize_list(list(String.t()), nil) :: {:ok, list(String.t())} | {:error, atom()}
-  def sanitize_list(list, nil) when is_list(list) do
-    {:ok, Enum.map(list, &sanitize/1)}
-  end
-
-  def sanitize_list(_list, nil), do: {:error, :invalid_input}
 end
