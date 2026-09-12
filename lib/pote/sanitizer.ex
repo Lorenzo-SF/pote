@@ -39,6 +39,10 @@ defmodule Pote.Sanitizer do
   """
   @spec sanitize_list(any(), String.t() | nil) ::
           {:ok, list(String.t())} | {:error, atom() | String.t()}
+  def sanitize_list(input, nil) when is_list(input) do
+    {:ok, Enum.map(input, &sanitize/1)}
+  end
+
   def sanitize_list(input, separator) when is_binary(input) and is_binary(separator) do
     {:ok, input |> String.split(separator) |> Enum.map(&sanitize/1)}
   end
