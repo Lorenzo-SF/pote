@@ -56,7 +56,7 @@ defmodule Pote.Style do
 
   # -- named colors -------------------------------------------------------
 
-  for {name, _rgb} <- Colors.Basic.named_colors() do
+  for {name, _rgb} <- Basic.named_colors() do
     @doc """
     Returns a style with `#{name}` as the foreground color.
 
