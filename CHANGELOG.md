@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] — 2026-07-31
+## [3.0.0] — 2026-09-18
 
 ### Added
 - `Pote.Style` — inline styling DSL: immutable `%Pote.Style{}` struct
@@ -49,15 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   only accept 0-5 in modern Elixir).
 - `Pote.Palette.remap_lightness/6` no longer triggers an unused
   variable warning.
-
-### Notes
-- P-4 (`Pote.Syntax`) is intentionally **not** implemented in this
-  release: `Alaja.Syntax` (sibling project, FASE 2) already provides
-  the tokenizer/highlighter; the spec allows marking it optional.
-
-## [Unreleased]
-
-### Fixed
 - Added `Pote.hwb/0` type alias (`{float(), float(), float()}`) so
   `Converters.hwb_to_rgb/1` and `rgb_to_hwb/1` resolve cleanly under
   Dialyzer (previously the `@spec` referenced an undefined type).
@@ -70,12 +61,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   colours, it now returns the endpoints (`[first, last]`) as the
   test expects instead of an interpolated middle value.
 
-### Changed
+### Notes
+- P-4 (`Pote.Syntax`) is intentionally **not** implemented in this
+  release: `Alaja.Syntax` (sibling project, FASE 2) already provides
+  the tokenizer/highlighter; the spec allows marking it optional.
+
+### Changed (post-implementation hardening)
 - Removed the deprecated `Pote.Format.ANSI` module and its test
   suite. The migration to `Pote.ColorInfo` / `Pote.Format.RGB` has
   been the recommended path since 2.x; deleting the stub closes the
-  deprecation cycle and removes a misleading `@deprecated` entry
-  from `mix.exs`.
+  deprecation cycle.
 - `lib/pote/theme/runtime.ex` — reordered the
   `Pote.Theme.{Templates, Theme}` alias to satisfy Credo's
   `AliasOrder` check.
@@ -88,13 +83,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `README.md` — fixed broken links: dropped the dangling
   `README_ES.md` reference and corrected the license link from
   `LICENSE` to `LICENSE.md`.
-
-### Refactored
-- **`Pote.Converters`** — extracted common conversion logic into
-  `Pote.Converters.Generic` module. The `Pote.Converters.Table` now
-  holds a central conversion table; individual converters delegate
-  to the generic engine. Backward-compatible — public API unchanged.
-- Added `Pote.Converters.GenericTest` for conversion correctness.
 
 ## [2.1.0] - 2026-07-07
 
@@ -136,9 +124,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial open source release: parsing, conversion, harmonization, gradient generation, ANSI rendering across RGB, Hex, HSL, HSV, CMYK, ARGB, XTerm256, Atom.
 
+[3.0.0]: https://hex.pm/packages/pote/3.0.0
 [2.1.0]: https://hex.pm/packages/pote/2.1.0
 [2.0.0]: https://hex.pm/packages/pote/2.0.0
 [1.0.0]: https://hex.pm/packages/pote/1.0.0
+[Unreleased]: https://github.com/Lorenzo-SF/pote/compare/3.0.0...HEAD
 
 
 > ## A note on history

@@ -52,7 +52,7 @@ defmodule Pote.MixProject do
       homepage_url: "https://github.com/Lorenzo-SF/pote",
       extras: ["README.md", "docs/README.es.md", "LICENSE.md"],
       groups_for_modules: [
-        Core: [Pote, Pote.ColorInfo],
+        Core: [Pote, Pote.ColorInfo, Pote.Error],
         Converters: [
           Pote.Converters,
           Pote.Converters.RGB,
@@ -74,12 +74,27 @@ defmodule Pote.MixProject do
           Pote.Format.Atom,
           Pote.Format.XTerm256
         ],
-        Harmonies: [Pote.Harmonies],
+        Harmonies: [Pote.Harmonies, Pote.Colors.Basic],
         Gradients: [Pote.Gradients],
+        Style: [Pote.Style, Pote.Palette],
         Display: [Pote.Display],
-        Validation: [Pote.Validator, Pote.Sanitizer],
-        Orchestration: [Pote.Orchestrator],
-        Themes: [Pote.Theme, Pote.Theme.Templates]
+        Validation: [
+          Pote.Validator,
+          Pote.Validator.Parser,
+          Pote.Validator.RGB,
+          Pote.Validator.Hex,
+          Pote.Validator.HSL,
+          Pote.Validator.HSV,
+          Pote.Validator.CMYK,
+          Pote.Validator.HWB,
+          Pote.Validator.Bracket,
+          Pote.Validator.XTerm,
+          Pote.Validator.Theme,
+          Pote.Sanitizer
+        ],
+        Orchestration: [Pote.Orchestrator, Pote.Orchestrator.Parser],
+        Accessibility: [Pote.Accessibility],
+        Themes: [Pote.Theme, Pote.Theme.Templates, Pote.Theme.Runtime]
       ],
       source_ref: @version
     ]
